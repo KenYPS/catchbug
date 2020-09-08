@@ -5,12 +5,12 @@ import { ContextStore } from 'Reducer'
 import { Map, List, fromJS } from 'immutable'
 
 // api
-import {  } from 'api'
+import { apiLogin } from 'api'
 
 // comp
 import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
-
+import Login from './Login'
 const menuList = fromJS([
     {
         name: '123',
@@ -18,17 +18,40 @@ const menuList = fromJS([
 ])
 
 export default props => {
+    const [modalOpen, setModalOpen] = useState(true)
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const activeNav = stateReducer.get('activeNav')
-    useEffect(()=>{
-        dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0,'name'])})
-    },[dispatch])
+    const account = stateReducer.get('account')
+
+    useEffect(() => {
+        dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0, 'name']) })
+    }, [dispatch])
+
+    function handleLogin(account, password) {
+        apiLogin(account, password, dispatch, setModalOpen)
+    }
+
+    function handleAddClick(params) {
+        
+    }
+
 
     return <Nav>
-        <StyledSearchBar />
+        <LoginArea>
+            <div>
+                {account}
+            </div>
+            {/* <button onClick={setModalOpen.bind(null, true)}>
+                {account ?'登出':'登入'}     
+            </button> */}
+        </LoginArea>
+        <StyledSearchBar handleAddClick={handleAddClick}/>
         <Menu
             list={menuList}
             activeNav={activeNav}
+        />
+        <Login modalOpen={modalOpen}
+            handleLogin={handleLogin}
         />
     </Nav>
 }
@@ -57,7 +80,18 @@ ${
 
 
 `
-
+const LoginArea = styled.div`
+width:100%;
+height: 30px;
+display: flex;
+justify-content:space-between;
+color:#00bcd4;
+>button{
+color:#00bcd4;
+cursor: pointer;
+padding:5px;
+}
+`
 const StyledSearchBar = styled(SearchBar)`
 display:none;
 >input{
@@ -73,6 +107,6 @@ padding:14px;
 ${media.tablet`
 display:block;
 `
-}
+    }
 
 `

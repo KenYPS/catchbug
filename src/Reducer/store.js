@@ -5,7 +5,10 @@ const SET_DATA = 'SET_DATA'
 const initialState = fromJS({
     theme: 'main',
     activeNav:'',
-    searchValue:''
+    searchValue:'',
+    account:'',
+    // fetch data
+    itemList:[]
 })
 
 const reducer = (state = initialState, action) => {

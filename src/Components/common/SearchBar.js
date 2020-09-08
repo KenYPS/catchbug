@@ -5,7 +5,7 @@ import { ContextStore } from 'Reducer'
 
 import {BiPlus} from 'react-icons/bi'
 
-export default ({ className }) => {
+export default ({ className, handleAddClick }) => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const searchValue = stateReducer.get('searchValue')
     const inputHandler = (value) => {
@@ -20,7 +20,7 @@ export default ({ className }) => {
             onChange={e => inputHandler(e.target.value)}
             autoFocus
         />
-        <BiPlus/>
+        <BiPlus onClick={handleAddClick}/>
     </SearchBar>
        
     

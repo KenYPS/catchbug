@@ -2,6 +2,9 @@ import React, { } from "react"
 import styled from 'styled-components'
 import media from 'cssMix'
 import { List } from 'immutable'
+
+import { apiLogin } from 'api'
+
 export default ({ 
     list = List(),
     activeNav
@@ -11,6 +14,7 @@ export default ({
             const name = v.get('name')
             return <div className={`list ${activeNav === name && 'active'}`}
                 key={name}
+                onClick={apiLogin}
             >
                 {name}
             </div>
@@ -21,7 +25,6 @@ export default ({
 // style
 const Menu = styled.div`
 background:${({ theme }) => theme.navBackground};
-
 width:100%;
 font-size:20px;
 color:${({ theme }) => theme.colors['5']};

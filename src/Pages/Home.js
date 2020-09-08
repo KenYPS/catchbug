@@ -4,7 +4,14 @@ import media from 'cssMix/index'
 
 import Nav from 'Components/Nav'
 import Main from 'Components/Main'
+
+
+import { useVerifyUser} from 'api'
+
 export default props => {
+
+    useVerifyUser()
+
     return <Home>
         <Nav/>
         <Main/>

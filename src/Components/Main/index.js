@@ -5,26 +5,21 @@ import { ContextStore } from 'Reducer'
 import { Map, List, fromJS } from 'immutable'
 
 // comp 
-import Search from './Search'
 import Items from './Items'
 // api
-import {  } from 'api'
+import { } from 'api'
 
 // util
 import { transToLowercaseAndTrim } from 'Utils/index'
 
-const listItems = fromJS(['111','333'])
+const listItems = fromJS(['111', '333'])
 
 export default props => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
-    const searchValue = stateReducer.get('searchValue')
-
-    return <Main onClick={() => { }}>
-      
+    return <Main>
         <Items
             list={listItems}
         />
-
     </Main>
 }
 
