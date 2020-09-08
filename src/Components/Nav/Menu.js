@@ -3,8 +3,6 @@ import styled from 'styled-components'
 import media from 'cssMix'
 import { List } from 'immutable'
 
-import { apiLogin } from 'api'
-
 export default ({ 
     list = List(),
     activeNav
@@ -14,7 +12,6 @@ export default ({
             const name = v.get('name')
             return <div className={`list ${activeNav === name && 'active'}`}
                 key={name}
-                onClick={apiLogin}
             >
                 {name}
             </div>

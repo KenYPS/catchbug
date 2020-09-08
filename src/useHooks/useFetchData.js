@@ -4,7 +4,7 @@ import {List ,Map} from "immutable"
 export default ({ api }) => {
     const [fetchData, setfetchData] = useState(List())
     const [isLoading, setIsLoading] = useState(false)
-    const fetchApiFunc = () => {
+    const fetchApiFunc = (dispatch, path) => {
         setIsLoading(true)
         let array =[]
         api.once("value", (res) => {

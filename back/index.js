@@ -1,16 +1,16 @@
 
 let express = require('express');
 const app = express()
+const bodyParser = require('body-parser');
+const firebase = require('./firebase')
 const port = process.env.PORT || 5000;
-// respond with "hello world" when a GET request is made to the homepage
 
-const db = require('./firebase')
+app.use(bodyParser.urlencoded({ extended: true }));
 
-    db.collection('users').doc('alovelace')
+
     
 app.post('/login', function (req, res) {
-    console.log(2222);
-    db.set({first:111})
+    console.log(req.body);
 });
 
 

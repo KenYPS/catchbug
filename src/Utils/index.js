@@ -11,4 +11,6 @@ export const getInitLang = (lang) => {
 }
 
 
-export const transToLowercaseAndTrim = (str)=>str.toLowerCase().trim()
+export const transToLowercaseAndTrim = (str) => str.toLowerCase().trim()
+
+export const abstractAccount = email => email.replace(/@.*$/, "")
