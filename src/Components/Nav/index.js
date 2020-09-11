@@ -5,13 +5,12 @@ import { ContextStore } from 'Reducer'
 import { Map, List, fromJS } from 'immutable'
 
 // api
-import { useApiLogin, apiLogin } from 'api'
+import { useApiLogin } from 'api'
 
 // comp
 import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
 import Login from './Login'
-
 
 export default props => {
     const [modalOpen, setModalOpen] = useState(true)
@@ -19,17 +18,14 @@ export default props => {
     const activeNav = stateReducer.get('activeNav')
     const account = stateReducer.get('account')
     const menuList = stateReducer.get('menuList')
-    // const apiLogin = useApiLogin(setModalOpen)
+    const apiLogin = useApiLogin(setModalOpen)
 
     useEffect(() => {
         dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0, 'name']) })
     }, [dispatch, menuList])
 
     function handleLogin(account, password) {
-        const data ={
-            account, password
-        }
-        apiLogin(data)
+        apiLogin(account, password)
     }
 
     function handleAddClick(params) {

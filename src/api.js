@@ -2,7 +2,7 @@ import { useEffect, useContext } from 'react'
 import * as firebase from 'firebase'
 import axios from 'axios'
 import { ContextStore } from 'Reducer'
-
+import {Map, fromJS} from 'immutable'
 
 import { abstractAccount } from 'Utils'
 
@@ -25,19 +25,19 @@ export const useVerifyUser = () => {
 }
 
 export const apiVerifyUser = () => {
-    return firebase.auth().currentUser
+    console.log(firebase.auth());
+    return firebase.auth()
 }
+
 
 export const useApiLogin = (setModalOpen) => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const site = stateReducer.getIn(['menuList', 0, 'name'])
     return (account, password) => firebase.auth().signInWithEmailAndPassword(account, password).then(res => {
-        console.log(333);
         const account = abstractAccount(res.user.email)
         apiGetData({ account, site, dispatch })
         dispatch({ type: 'SET_DATA', path: 'account', value: account })
         setModalOpen(false)
-
     }).catch(res => {
         alert(res)
         return res
@@ -50,18 +50,13 @@ export const apiLogin = (data)=>{
     return axios.post('/login', data)
 }
 
-export const apiGetData = ({ account, site ,dispatch}) => {
-    const data = database.ref(`/${site}/${account}`).once("value", (res) => {
-        const val = res.val()
-        let array = []
-        for (const key in val) {
-            if (val.hasOwnProperty(key)) {
-                const element = Map(val[key]).merge(Map({ key }))
-                array.push(element)
-            }
-        }
-        dispatch({ type: 'SET_DATA', path: 'itemList', value: array })
 
+export const apiGetData = ({ account, site ,dispatch}) => {
+
+    
+        database.ref(`/${site}/${account}`).once("value", (res) => {
+        const val = res.val()
+        dispatch({ type: 'SET_DATA', path: 'itemList', value: fromJS(val) })
     })
 }
 
