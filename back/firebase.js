@@ -1,7 +1,12 @@
-const firebase = require('firebase')
+const admin = require("firebase-admin")
 
-const config = require('../src/config')
+var serviceAccount = require("./catchbug-f8326-firebase-adminsdk-7ho3s-05767e750b.json")
 
-firebase.initializeApp(config)
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://catchbug-f8326.firebaseio.com"
+});
 
-module.exports = firebase
+module.exports = {
+    admin
+}

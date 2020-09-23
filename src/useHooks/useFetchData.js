@@ -19,7 +19,6 @@ export default ({ api }) => {
             setIsLoading(false)
         })
     }
-
     return {
         isLoading,
         fetchApiFunc,

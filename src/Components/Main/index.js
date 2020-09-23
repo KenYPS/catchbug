@@ -14,9 +14,16 @@ import { } from 'api'
 const listItems = fromJS(['111', '333'])
 
 export default props => {
+
+    const addItemValue =()=>{
+
+}
+
+
     return <Main>
         <Items
             list={listItems}
+            addItemValue={addItemValue}
         />
     </Main>
 }
