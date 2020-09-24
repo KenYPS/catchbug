@@ -3,30 +3,29 @@ import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
 
-
 // comp
 import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
 
 // api 
-import { apiLogOut } from 'api'
+import { apiLogOut, apiAddList} from 'api'
 export default props => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const activeNav = stateReducer.get('activeNav')
     const account = stateReducer.get('account')
     const menuList = stateReducer.get('menuList')
+    const addValue = stateReducer.get('searchValue')
+    const site = stateReducer.getIn(['menuList', 0, 'name'])
 
-
-    
     useEffect(() => {
         dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0, 'name']) })
     }, [dispatch, menuList])
 
-    function handleAddClick(params) {
-
+    function handleAddClick() {
+        apiAddList({ addValue, site }, dispatch)
     }
 
-    function handleSignOut(params) {
+    function handleSignOut() {
         apiLogOut()
     }
 

@@ -1,40 +1,61 @@
-import React, { memo } from "react"
-import styled, {  } from 'styled-components'
+import React, { memo, useState } from "react"
+import styled, { } from 'styled-components'
 import media from 'cssMix/index'
-import {  } from 'immutable'
-
-
+import { BsThreeDots } from 'react-icons/bs'
 export default memo(({ list,
-    isLack = true
+    handleImgClick,
+    handleRemoveClick
 }) => {
-    
+    const [menu, setMenu] = useState()
     return <GamesContainer>
         {
             list.map((v, i) => {
+                const itemNum = v.get('itemNum')
+                const itemImg = v.get('itemImg')
+                const itemName = v.get('itemName')
+                const itemPrice = v.get('itemPrice')
+                const itemStockStatus = v.get('itemStockStatus')
+                const itemLink = v.get('itemLink')
                 return <ItemCard key={i}
-                    backgroundImg={'https://www.costco.com.tw/medias/sys_master/images/h7f/h83/11953476272158.jpg'}
+                    backgroundImg={itemImg}
                 >
-                    <div className='gameCardimg'>
-                            {isLack && <div className='maintain'>
+                    <div className='gameCardNum'>
+                        {itemNum}
+                        <BsThreeDots onClick={() => setMenu(pre=> !!pre ? '' : itemNum)} />
+                        {menu === itemNum && <div className={`gameCardMenu`} onClick={handleRemoveClick.bind(null,itemNum)}>
+                            移除項目
+                        </div>}
+                    </div>
+                    <div className='gameCardimg' onClick={() => handleImgClick(itemLink)} >
+                        {
+                            itemStockStatus ? <div className='maintain'>
                                 <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' />
                                 <div>缺貨</div>
-                            </div>
-                            }
-                        {/* <img className='gameLogo' alt='' src={icon} /> */}
-                        <div className='hoverBg'>
-                            <div>進入網站</div>
-                        </div>
+                            </div> : <div className='hoverBg'>
+                                    <div>進入網站</div>
+                                </div>
+                        }
                     </div>
                     <div className='gameCardTitle'>
-                        青豆
+                        {itemPrice}
                     </div>
-
+                    <div className='gameCardContent'>
+                        {itemName}
+                    </div>
                 </ItemCard>
             })
         }
     </GamesContainer>
 
 })
+
+
+const Menu = () => {
+
+    return <div>
+        取消追蹤
+    </div>
+}
 
 const GamesContainer = styled.div`
 width:100%;
@@ -49,6 +70,30 @@ const ItemCard = styled.div`
 width:173px;
 margin:0 10px 40px 10px;
 position: relative;
+ .gameCardNum{
+    color:${({ theme }) => theme.colors['6']};
+    margin-bottom:3px;
+    display: flex;
+    justify-content:space-between;
+    position: relative;
+    >svg{
+        cursor: pointer;
+    }
+    .gameCardMenu{
+        position: absolute;
+        right: 0;
+        top: 20px;
+        background: #de0e35;
+        width: 90px;
+        height: 30px;
+        z-index: 20;
+        color: white;
+        border-radius: 5px;
+        line-height:30px;
+        text-align:center;
+        cursor: pointer;
+    }
+    }
     .gameCardimg{
         width:100%;
         height:172px;
@@ -129,12 +174,8 @@ position: relative;
     color:${({ theme }) => theme.colors['6']};
     margin-bottom:9px;
     }
-    .gameCardType{
-    font-size:13px;
-    color:${({ theme }) => theme.colors['4']};
-    padding:1px 8px;
-    border: 1px solid ${({ theme }) => theme.colors['4']};
-    border-radius: 12.5px;
+    .gameCardContent{
+        color:#0060a9
     }
 
 
@@ -168,8 +209,7 @@ position: relative;
                 display:none;           
             }
     `}
-${
-    media.mobile`
+${media.mobile`
     margin:0 5px 30px 5px;
     `
     }

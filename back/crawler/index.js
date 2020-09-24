@@ -1,18 +1,17 @@
 const request = require("request")
 const cheerio = require("cheerio")
+const globalStore = require('../store')
 
 const startCrawler = (list = []) => {
-
     const iteralList = async () => {
         const lists = await Promise.all(
             list.map(crawl)
         )
-        console.log(lists);
+        globalStore.itemLists = lists
+        console.log(globalStore.itemLists);
         return lists
     }
-
     iteralList()
-
     setInterval(iteralList, 60 * 1000)
 }
 
@@ -35,14 +34,17 @@ function crawl(itemNum) {
             const itemImg = itemContainer.find('a img').attr('src')
             const itemName = itemContainer.find('.product-info-wrapper .product-list-details .product-name-container a').text()
             const itemPrice = itemContainer.find('.product-info-wrapper .product-price-amount').text().trim()
-            const itemStockStatus = !itemContainer.find('.stock-status .out-of-stock-message').text()
+            const itemStockStatus = itemContainer.find('.stock-status .out-of-stock-message').text()
+            const itemLink = itemContainer.find('a').attr('href')
             const data = {
                 itemImg: `https://www.costco.com.tw/medias/sys_master${itemImg}`,
                 itemName,
                 itemPrice,
-                itemStockStatus
+                itemStockStatus,
+                itemLink: `https://www.costco.com.tw/${itemLink}`,
+                itemNum
             }
-            resolve({[itemNum]:data})
+            resolve(data)
         })
     });
 }

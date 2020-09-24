@@ -6,7 +6,7 @@ import SearchBar from 'Components/common/SearchBar'
 // icon
 import { IoIosSearch, IoMdClose } from 'react-icons/io'
 
-export default ({ name, searchValue = '', t, addItemValue }) => {
+export default ({ name, searchValue = '', t, handleAddClick }) => {
     return <>
         <SearchBarArea>
             <div>
@@ -14,7 +14,7 @@ export default ({ name, searchValue = '', t, addItemValue }) => {
             </div>
             <div className='bar'>
                 <SearchBar />
-                {!searchValue ? <IoIosSearch /> : <IoMdClose onClick={addItemValue} />}
+                {!searchValue ? <IoIosSearch /> : <IoMdClose onClick={handleAddClick} />}
             </div>
         </SearchBarArea>
         {

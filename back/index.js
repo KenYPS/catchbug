@@ -3,19 +3,14 @@ let express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const { admin } = require('./firebase')
-const { abstractAccount} =require('./Utils')
+const { abstractAccount } = require('./Utils')
 require('./getBug')
-
+const globalStore = require('./store')
+const { resCode } = globalStore
 const port = process.env.PORT || 5000
 
 const firebaseDB = admin.database()
 
-const resCode = {
-    error_code: 1,
-    error_msg: "SUCCESS",
-    log_id: "",
-    result: []
-}
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -25,16 +20,55 @@ app.get('/getList', (req, res) => {
     const { site } = req.query
     const token = req.headers.token
     checkAuth(token, res).then(account => {
-        const { error_code } = resCode
-        if (error_code) {
+        if (resCode.error_code) {
+            getUserItemList({ site, account ,res})
+        }
+    })
+})
+
+app.put('/addList', (req, res) => {
+    const { addValue, site} = req.body 
+    const token = req.headers.token
+    checkAuth(token, res).then(account => {
+        if (resCode.error_code) {
             firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
-                resCode.result = snap.val()
-                res.send(resCode)
+                const userItemLists = snap.val()
+                return [...userItemLists, addValue]
+            }).then(list=>{
+                firebaseDB.ref(`${site}/${account}`).set(list, err=>{
+                    if(!err){
+                        getUserItemList({ site, account, res })
+                    }
+                })
             })
         }
     })
 })
 
+
+
+app.put('/deleteList', (req, res) => {
+    const { itemNum, site } = req.body
+    const token = req.headers.token
+    checkAuth(token, res).then(account => {
+        if (resCode.error_code) {
+            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
+                const userItemLists = snap.val()
+                return userItemLists.filter(v => v !== itemNum)
+            }).then(list => {
+                firebaseDB.ref(`${site}/${account}`).set(list, err => {
+                    if (!err) {
+                        getUserItemList({ site, account, res })
+                    }
+                })
+            })
+        }
+    })
+
+})
+
+
+// check auth before every connect
 const checkAuth = (token) => {
     return admin.auth().verifyIdToken(token).then(res => {
         const { email } = res
@@ -46,5 +80,15 @@ const checkAuth = (token) => {
     })
 }
 
+
+function getUserItemList({ site, account, res}) {
+    firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
+        const { itemLists } = globalStore
+        const userItemLists = snap.val()
+        const data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
+        resCode.result = data
+        res.send(resCode)
+    })
+}
 
 app.listen(port, () => console.log(`listen on port ${port}`))
