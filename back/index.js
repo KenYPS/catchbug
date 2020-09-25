@@ -7,12 +7,15 @@ const { admin } = require('./firebase')
 const { abstractAccount } = require('./Utils')
 require('./getBug')
 const globalStore = require('./store')
+const path = require('path');
+
 const { resCode } = globalStore
+
 const port = process.env.PORT || 5000
 
 const firebaseDB = admin.database()
 
-
+app.use(express.static(path.join(__dirname, '../build')));
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.raw())
@@ -92,13 +95,9 @@ function getUserItemList({ site, account, res }) {
     })
 }
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('/build'))
-    const path = require('path')
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
-    })
-}
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '../build/index.html'))
+});
 
 var server = app.listen(process.env.PORT || 5000, function () {
     var port = server.address().port
