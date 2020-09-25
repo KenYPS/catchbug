@@ -2,10 +2,12 @@ import React, { } from "react"
 import styled from 'styled-components'
 import media from 'cssMix'
 import { List } from 'immutable'
+import { IoMdRefresh} from 'react-icons/io'
 
 export default ({ 
     list = List(),
-    activeNav
+    activeNav,
+    handleRefresh
 }) => {
     return <Menu>
         {list.map(v => {
@@ -16,11 +18,13 @@ export default ({
                 {name}
             </div>
         })}
+        <IoMdRefresh onClick={handleRefresh}/>
     </Menu>
 }
 
 // style
 const Menu = styled.div`
+position: relative;
 background:${({ theme }) => theme.navBackground};
 width:100%;
 font-size:20px;
@@ -34,7 +38,14 @@ cursor: pointer;
       color:${({ theme }) => theme.colors['1']};
     }
 }
+>svg{
+    position: absolute;
+    right:0;
+    width:30px;
+    height: 30px;
+    color:${({ theme }) => theme.colors['1']};
 
+}
 ${media.tablet`
 display:flex;
 align-items:center;

@@ -7,15 +7,16 @@ const { admin } = require('./firebase')
 const { abstractAccount } = require('./Utils')
 require('./getBug')
 const globalStore = require('./store')
-const path = require('path');
+const path = require('path')
 
 const { resCode } = globalStore
 
-const port = process.env.PORT || 5000
-
 const firebaseDB = admin.database()
 
-app.use(express.static(path.join(__dirname, '../build')));
+if (process.env.NODE_ENV === 'production')
+    app.use(express.static(path.join(__dirname, '../build')))
+
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.raw())
@@ -85,21 +86,28 @@ const checkAuth = (token) => {
 }
 
 
-function getUserItemList({ site, account, res }) {
+function getUserItemList({ site, account, res }, data) {
     firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
         const { itemLists } = globalStore
         const userItemLists = snap.val()
-        const data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
+        if (!userItemLists) {
+            console.log(site);
+            firebaseDB.ref(`${site}`).update({ [account]: [{createTime:new Date()}] })
+        }
+
+        data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
+
         resCode.result = data
         res.send(resCode)
     })
 }
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '../build/index.html'))
-});
+if (process.env.NODE_ENV === 'production')
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname + '../build/index.html'))
+    })
 
 var server = app.listen(process.env.PORT || 5000, function () {
     var port = server.address().port
     console.log("Express is working on port " + port)
-});
+})

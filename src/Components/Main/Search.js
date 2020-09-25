@@ -4,24 +4,17 @@ import media from 'cssMix/index'
 // comp 
 import SearchBar from 'Components/common/SearchBar'
 // icon
-import { IoIosSearch, IoMdClose } from 'react-icons/io'
+import { IoMdRefresh } from 'react-icons/io'
 
-export default ({ name, searchValue = '', t, handleAddClick }) => {
+
+export default ({ className, handleRefresh, handleAddClick }) => {
     return <>
         <SearchBarArea>
-            <div>
-                {!!searchValue ? t('gameSearch') : name}
-            </div>
             <div className='bar'>
-                <SearchBar />
-                {!searchValue ? <IoIosSearch /> : <IoMdClose onClick={handleAddClick} />}
+                <SearchBar className={className} handleAddClick={handleAddClick}/>
             </div>
+            <IoMdRefresh onClick={handleRefresh}/>
         </SearchBarArea>
-        {
-            searchValue && <SearchResult>
-                <span className='searchValue'>{{ searchValue }}</span>
-            </SearchResult>
-        }
     </>
 }
 
@@ -37,18 +30,19 @@ margin-bottom:62px;
         position: relative;
         box-sizing:border-box;
         width:320px;
+        height: 100%;
         border: solid 1px ${({ theme }) => theme.colors['4']};
         border-radius: 25.5px;
         align-self: stretch;
-        padding:0 40px 0 20px;
-        >input{
+        padding:0 0 0 20px;
+        input{
             width:100%;
             height:100%;
             background:transparent;
             color:#ffffff;
             font-size:16px;
         }
-        >svg{
+        svg{
             position: absolute;
             right:19px;;
             top:50%;
@@ -59,16 +53,13 @@ margin-bottom:62px;
             height:24px;
         }
     }
+    >svg{
+    color:${({ theme }) => theme.colors['1']};
+    width:30px;
+    height: 30px;
+    cursor:pointer;
+    }
     ${media.tablet`
     display:none;
     `}
-`
-
-
-const SearchResult = styled.div`
-    color: ${({ theme }) => theme.colors['4']};
-    font-size:20px;
-    .searchValue{
-        color: ${({ theme }) => theme.colors['1']};
-    }
 `

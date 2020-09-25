@@ -26,7 +26,7 @@
     "start": " node ./back/index.js",
     "startFront": " PORT=8000 react-scripts start GENERATE_SOURCEMAP=false",
     "startBack": "nodemon ./back/index.js",
-    "build": "react-scripts build",
+    "build": "react-scripts build GENERATE_SOURCEMAP=false",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

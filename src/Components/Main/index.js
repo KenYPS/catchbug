@@ -1,12 +1,13 @@
-import React, { useContext } from "react"
+import React, { useContext, useMemo } from "react"
 import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
 
 // comp 
 import Items from './Items'
+import Search from './Search'
 // api
-import { apiDeleteList} from 'api'
+import { apiDeleteList, apiAddList, apiGetList} from 'api'
 
 // util
 // import { transToLowercaseAndTrim } from 'Utils/index'
@@ -15,7 +16,12 @@ export default props => {
     const { state: { stateReducer },dispatch } = useContext(ContextStore)
     const itemList = stateReducer.get('itemList')
     const site = stateReducer.getIn(['menuList', 0, 'name'])
-
+    const addValue = stateReducer.get('searchValue')
+    const filteredList = useMemo(()=> itemList.filter(v => {
+            const itemNum = v.get('itemNum')
+        return itemNum.includes(addValue)
+        })
+        , [itemList, addValue])
     const handleRemoveClick = (itemNum) => {
         apiDeleteList({ itemNum, site }, dispatch)
     }
@@ -28,10 +34,16 @@ export default props => {
             windowOpen.location.href = link
         })
     }
-
+    function handleAddClick() {
+        apiAddList({ addValue, site }, dispatch)
+    }
+    function handleRefresh() {
+        apiGetList({ site }, dispatch)
+    }
     return <Main>
+        <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh}/>
         <Items
-            list={itemList}
+            list={filteredList}
             handleRemoveClick={handleRemoveClick}
             handleImgClick={handleImgClick}
         />

@@ -1,9 +1,12 @@
 import { useEffect, useContext } from 'react'
-import * as firebase from 'firebase'
+import firebase from '@firebase/app'
 import axios from 'axios'
 import { ContextStore } from 'Reducer'
 import { fromJS } from 'immutable'
 import get from 'lodash/get'
+
+import '@firebase/auth'
+import '@firebase/database'
 
 import { abstractAccount } from 'Utils'
 
@@ -29,7 +32,6 @@ export const useApiVerifyUser = (setModalOpen) => {
     const site = stateReducer.getIn(['menuList', 0, 'name'])
     useEffect(() => {
         firebase.auth().onAuthStateChanged(user => {
-            console.log(user);
             if (user) {
                 logginedDispatch(user, setModalOpen, dispatch, site)
             } else {
@@ -52,8 +54,9 @@ export const useApiGoogleLogin = (setModalOpen) => {
 }
 
 // log out
-export const apiLogOut = () => {
+export const apiLogOut = (dispatch) => {
     localStorage.removeItem('token')
+    dispatch({ type: 'SET_DATA', path: 'account', value: '' })
     return firebase.auth().signOut()
 }
 
@@ -110,7 +113,7 @@ export const apiGetList = (params, dispatch) => service.get('/getList', { params
 
 // add list
 export const apiAddList = (data, dispatch) => service.put('/addList', data).then(({ result }) => {
-    // dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
+    dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
 })
 
 

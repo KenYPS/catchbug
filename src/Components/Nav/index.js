@@ -8,7 +8,7 @@ import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
 
 // api 
-import { apiLogOut, apiAddList} from 'api'
+import { apiLogOut, apiAddList, apiGetList} from 'api'
 export default props => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const activeNav = stateReducer.get('activeNav')
@@ -26,9 +26,11 @@ export default props => {
     }
 
     function handleSignOut() {
-        apiLogOut()
+        apiLogOut(dispatch)
     }
-
+    function handleRefresh() {
+        apiGetList({ site }, dispatch)
+    }
     return <Nav>
         <LoginArea>
             <div>
@@ -42,6 +44,7 @@ export default props => {
         <Menu
             list={menuList}
             activeNav={activeNav}
+            handleRefresh={handleRefresh}
         />
         {/* <Login modalOpen={modalOpen}
             handleLogin={handleLogin}

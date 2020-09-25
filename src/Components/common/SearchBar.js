@@ -11,16 +11,17 @@ export default ({ className, handleAddClick }) => {
     const inputHandler = (value) => {
         dispatch({ type: 'SET_DATA', path: 'searchValue', value })
     }
-
     return <SearchBar
         className={className}>
         <input
-            placeholder={'新增搜尋'}
+            placeholder={'新增搜尋costco商品編號'}
             value={searchValue}
             onChange={e => inputHandler(e.target.value)}
             autoFocus
         />
         <BiPlus onClick={handleAddClick}/>
+
+        
     </SearchBar>
        
     
@@ -29,6 +30,7 @@ export default ({ className, handleAddClick }) => {
 
 const SearchBar = styled.div`
 width:100%;
+height: 100%;
 position: relative;
 
 >svg{
