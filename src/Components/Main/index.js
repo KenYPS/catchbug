@@ -18,7 +18,7 @@ export default props => {
     const site = stateReducer.getIn(['menuList', 0, 'name'])
     const addValue = stateReducer.get('searchValue')
     const filteredList = useMemo(()=> itemList.filter(v => {
-            const itemNum = v.get('itemNum')
+            const itemNum = v.get('itemNum',[])
         return itemNum.includes(addValue)
         })
         , [itemList, addValue])
