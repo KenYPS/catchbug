@@ -1,6 +1,6 @@
 
 const express = require('express')
-require('dotenv').config();
+require('dotenv').config()
 const app = express()
 const bodyParser = require('body-parser')
 const { admin } = require('./firebase')
@@ -8,7 +8,7 @@ const { abstractAccount } = require('./Utils')
 require('./getBug')
 const globalStore = require('./store')
 const { resCode } = globalStore
-const port =  5000
+const port = process.env.PORT || 5000
 
 const firebaseDB = admin.database()
 
@@ -22,22 +22,22 @@ app.get('/getList', (req, res) => {
     const token = req.headers.token
     checkAuth(token, res).then(account => {
         if (resCode.error_code) {
-            getUserItemList({ site, account ,res})
+            getUserItemList({ site, account, res })
         }
     })
 })
 
 app.put('/addList', (req, res) => {
-    const { addValue, site} = req.body 
+    const { addValue, site } = req.body
     const token = req.headers.token
     checkAuth(token, res).then(account => {
         if (resCode.error_code) {
             firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
                 const userItemLists = snap.val()
                 return [...userItemLists, addValue]
-            }).then(list=>{
-                firebaseDB.ref(`${site}/${account}`).set(list, err=>{
-                    if(!err){
+            }).then(list => {
+                firebaseDB.ref(`${site}/${account}`).set(list, err => {
+                    if (!err) {
                         getUserItemList({ site, account, res })
                     }
                 })
@@ -82,7 +82,7 @@ const checkAuth = (token) => {
 }
 
 
-function getUserItemList({ site, account, res}) {
+function getUserItemList({ site, account, res }) {
     firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
         const { itemLists } = globalStore
         const userItemLists = snap.val()
@@ -92,4 +92,15 @@ function getUserItemList({ site, account, res}) {
     })
 }
 
-app.listen(port, () => console.log(`listen on port ${port}`))
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('/build'))
+    const path = require('path')
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
+    })
+}
+
+var server = app.listen(process.env.PORT || 5000, function () {
+    var port = server.address().port
+    console.log("Express is working on port " + port)
+});
