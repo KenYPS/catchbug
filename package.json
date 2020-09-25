@@ -23,7 +23,8 @@
     "styled-components": "^5.1.1"
   },
   "scripts": {
-    "start": " PORT=8000 react-scripts start GENERATE_SOURCEMAP=false",
+    "start": " node ./back/index.js",
+    "startFront": " PORT=8000 react-scripts start GENERATE_SOURCEMAP=false",
     "startBack": "nodemon ./back/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
