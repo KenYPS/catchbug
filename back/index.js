@@ -1,5 +1,6 @@
 
-let express = require('express')
+const express = require('express')
+require('dotenv').config();
 const app = express()
 const bodyParser = require('body-parser')
 const { admin } = require('./firebase')
@@ -7,7 +8,7 @@ const { abstractAccount } = require('./Utils')
 require('./getBug')
 const globalStore = require('./store')
 const { resCode } = globalStore
-const port = process.env.PORT || 5000
+const port =  5000
 
 const firebaseDB = admin.database()
 

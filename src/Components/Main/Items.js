@@ -50,13 +50,6 @@ export default memo(({ list,
 })
 
 
-const Menu = () => {
-
-    return <div>
-        取消追蹤
-    </div>
-}
-
 const GamesContainer = styled.div`
 width:100%;
 display: flex;
