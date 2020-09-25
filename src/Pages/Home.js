@@ -5,7 +5,7 @@ import media from 'cssMix/index'
 import Nav from 'Components/Nav'
 import Main from 'Components/Main'
 import Login from 'Components/Login'
-
+import GoTop from 'Components/GoTop'
 
 export default props => {
     
@@ -13,6 +13,7 @@ export default props => {
         <Nav/>
         <Main/>
         <Login/>
+        <GoTop/>
     </Home>
 }
 

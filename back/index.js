@@ -95,7 +95,6 @@ const checkAuth = (token) => {
     })
 }
 
-
 function getUserItemList({ site, account, res }, data) {
     firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
         const { itemLists } = globalStore
@@ -104,7 +103,6 @@ function getUserItemList({ site, account, res }, data) {
             firebaseDB.ref(`${site}`).update({ [account]: ['9987741'] })
         }
         data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
-
         resCode.result = data
         res.send(resCode)
     })
