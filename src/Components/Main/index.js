@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from "react"
 import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
-
+import {List } from 'immutable'
 // comp 
 import Items from './Items'
 import Search from './Search'
@@ -14,11 +14,11 @@ import { apiDeleteList, apiAddList, apiGetList} from 'api'
 
 export default props => {
     const { state: { stateReducer },dispatch } = useContext(ContextStore)
-    const itemList = stateReducer.get('itemList')
+    const itemList = stateReducer.get('itemList', List)
     const site = stateReducer.getIn(['menuList', 0, 'name'])
     const addValue = stateReducer.get('searchValue')
     const filteredList = useMemo(()=> itemList.filter(v => {
-            const itemNum = v.get('itemNum',[])
+            const itemNum = v.get('itemNum' ,'')
         return itemNum.includes(addValue)
         })
         , [itemList, addValue])

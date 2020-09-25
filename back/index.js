@@ -38,6 +38,7 @@ app.put('/addList', (req, res) => {
         if (resCode.error_code) {
             firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
                 const userItemLists = snap.val()
+                if (userItemLists.includes(addValue)) return userItemLists
                 return [...userItemLists, addValue]
             }).then(list => {
                 firebaseDB.ref(`${site}/${account}`).set(list, err => {
