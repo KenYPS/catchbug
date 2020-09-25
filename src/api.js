@@ -97,7 +97,7 @@ service.interceptors.response.use(
         const result = fromJS(get(res, ['data', 'result']))
         const error_code = get(res, ["data", "error_code"])
         const error_msg = get(res, ["data", "error_msg"])
-
+        if (error_code !== 1) alert(error_msg)
         return { result, error_code, error_msg }
     },
     error => {
@@ -107,12 +107,12 @@ service.interceptors.response.use(
 )
 
 // get list
-export const apiGetList = (params, dispatch) => service.get('/getList', { params }).then(({ result}) => {
+export const apiGetList = (params, dispatch) => service.get('/getList', { params }).then(({  result}) => {
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result})
 })
 
 // add list
-export const apiAddList = (data, dispatch) => service.put('/addList', data).then(({ result }) => {
+export const apiAddList = (data, dispatch) => service.put('/addList', data).then(({ error_code, result }) => {
     dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
 })
 

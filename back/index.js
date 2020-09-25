@@ -36,16 +36,25 @@ app.put('/addList', (req, res) => {
     const token = req.headers.token
     checkAuth(token, res).then(account => {
         if (resCode.error_code) {
-            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
+            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => new Promise((resolve, rej)=>{
                 const userItemLists = snap.val()
-                if (userItemLists.includes(addValue)) return userItemLists
-                return [...userItemLists, addValue]
-            }).then(list => {
+                if (userItemLists.includes(addValue)) rej({ msg: '商品已在列表' })
+                resolve([...userItemLists, addValue]) 
+            })
+            ).then(list => {
                 firebaseDB.ref(`${site}/${account}`).set(list, err => {
                     if (!err) {
                         getUserItemList({ site, account, res })
                     }
                 })
+            },err=>{
+                console.log(err);
+                    const { msg} =err
+                    const errRes = { ...resCode}
+                    errRes.error_code = 999
+                    errRes.error_msg = msg
+                    errRes.result=[]
+                    res.send(errRes)
             })
         }
     })
@@ -92,10 +101,8 @@ function getUserItemList({ site, account, res }, data) {
         const { itemLists } = globalStore
         const userItemLists = snap.val()
         if (!userItemLists) {
-            console.log(site);
-            firebaseDB.ref(`${site}`).update({ [account]: [{createTime:new Date()}] })
+            firebaseDB.ref(`${site}`).update({ [account]: ['9987741'] })
         }
-
         data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
 
         resCode.result = data
