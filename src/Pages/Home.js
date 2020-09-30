@@ -7,8 +7,10 @@ import Main from 'Components/Main'
 import Login from 'Components/Login'
 import GoTop from 'Components/GoTop'
 
+import { useLineLoggingCheck} from 'api'
+
 export default props => {
-    
+    useLineLoggingCheck()
     return <Home>
         <Nav/>
         <Main/>

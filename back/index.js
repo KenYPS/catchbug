@@ -5,12 +5,11 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { admin } = require('./firebase')
 const path = require('path')
-
 const {linebotParser} = require('./linebot')
-
 const globalStore = require('./store')
 const { abstractAccount } = require('./Utils')
-
+// const request = require("request")
+const { request } = require('gaxios');
 
 const { resCode } = globalStore
 
@@ -19,7 +18,7 @@ const firebaseDB = admin.database()
 
 const app = express()
 
-if (process.env.NODE_ENV === 'production')
+// if (process.env.NODE_ENV === 'production')
     app.use(express.static(path.join(__dirname, '../build')))
 
 
@@ -120,16 +119,48 @@ function getUserItemList({ site, account, res }, data) {
 
 // ----------- line -----------
 
-
-app.get('/line/login', (req, res) => {
+app.post('/line/login', (req, res) => {
+    const code = req.body.code
+    console.log(code)
+    let post_data = {
+        'grant_type': '	authorization_code',
+        'code': code,
+        'redirect_uri': 'https://845f408d0a68.ngrok.io/',
+        'client_id': '1654992288',
+        'client_secret': process.env.line_login_channelSecret
+    };
+    let URL = 'https://api.line.me/oauth2/v2.1/token?'
+    URL += 'grant_type=authorization_code'
+    URL += `&code=${code}`
+    URL += '&redirect_uri=https://845f408d0a68.ngrok.io/'
+    URL += '&client_id=1654992288'
+    URL += `&client_secret=${process.env.line_login_channelSecret}`;
+//    const option={
+//        host: 'https://api.line.me/oauth2/v2.1/token',
+//        method: 'POST',
+//        headers: {
+//            'Content-Type': 'application/x-www-form-urlencoded',
+//            'Content-Length': Buffer.byteLength(post_data)
+//        }
+//    }
    
-    res.send(resCode)
-
+    // app.post('https://api.line.me/oauth2/v2.1/token', post_data )
+   request({
+       url: URL,
+        method: 'POST',
+        headers: {
+           'Content-Type': 'application/x-www-form-urlencoded',
+       },
+    }).then(res=>{
+        console.log('111111111',res);
+    },err=>{
+        console.log('222222', err.response);
+    })
 })
 
 
 
-if (process.env.NODE_ENV === 'production')
+// if (process.env.NODE_ENV === 'production')
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname + '../build/index.html'))
     })

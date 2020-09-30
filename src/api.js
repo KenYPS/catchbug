@@ -4,6 +4,7 @@ import axios from 'axios'
 import { ContextStore } from 'Reducer'
 import { fromJS } from 'immutable'
 import get from 'lodash/get'
+import {  useLocation } from "react-router-dom"
 
 import '@firebase/auth'
 import '@firebase/database'
@@ -39,7 +40,6 @@ export const useApiVerifyUser = (setModalOpen) => {
             }
         })
     }, [dispatch, setModalOpen, site])
-
 }
 
 //  google account login
@@ -110,6 +110,37 @@ export const apiDeleteList = (data,dispatch) =>googleLogin.put('/deleteList', da
 
 
 
+
+
 // line 
 
-export const apiLineLogin = ()=>axios.get('/line/login')
+
+export const useLineLoggingCheck =()=>{
+    const afterQuery = new URLSearchParams(useLocation().search)
+    const query = new URLSearchParams(window.location.search)
+    const checkCode = query.get('code')
+    const code = afterQuery.get('code')
+    useEffect(()=>{
+        if (checkCode && !code) {
+            console.log(123);
+            window.location.href = window.location.origin + '/#/' + window.location.search
+        }
+        if (code) {
+            console.log(code);
+            apiLineAuth({code})
+        }
+    },[checkCode, code])
+}
+
+export const apiLineLogin = ()=>{
+    let URL = `https://access.line.me/oauth2/v2.1/authorize?`
+    URL += 'response_type=code'
+    URL += '&client_id=1654992288'
+    URL += '&redirect_uri=https://845f408d0a68.ngrok.io/'
+    URL += '&state=123'
+    URL += '&scope=openid%20profile';
+    window.location.href = URL
+    
+}
+
+const apiLineAuth = (data)=>axios.post('/line/login', data)

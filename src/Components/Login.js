@@ -14,15 +14,8 @@ export default ( ) => {
     function handleGoogleLogin() {
         apiGoogleLogin()
     }
+    
     function handleLineLogin() {
-      const winOpen=  window.open()
-        var URL = 'https://access.line.me/oauth2/v2.1/authorize?'
-        URL += 'response_type=code'
-        URL += '&client_id=1654992288'
-        URL += '&redirect_uri=https://45387844df5e.ngrok.io'
-        URL += '&state=abcde'
-        URL += '&scope=openid%20profile'
-        winOpen.location.href = URL
         apiLineLogin()
     }
 
