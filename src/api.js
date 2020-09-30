@@ -55,34 +55,20 @@ export const useApiGoogleLogin = (setModalOpen) => {
 
 // log out
 export const apiLogOut = (dispatch) => {
+    firebase.auth().signOut()
     localStorage.removeItem('token')
     dispatch({ type: 'SET_DATA', path: 'account', value: '' })
-    return firebase.auth().signOut()
+    dispatch({ type: 'SET_DATA', path: 'itemList', value: [] })
 }
-
-
-// email login
-// export const useApiEmailLogin = (setModalOpen) => {
-//     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
-//     const site = stateReducer.getIn(['menuList', 0, 'name'])
-//     return (account, password) => firebase.auth().signInWithEmailAndPassword(account, password).then(res => {
-//         const user = res.user
-//         apiGetData({ account, site, dispatch })
-//         logginedDispatch(user, setModalOpen, dispatch)
-//     }).catch(res => {
-//         alert(res)
-//         return res
-//     })
-// }
 
 
 
 // -----------------------------------------
 // Axios
 
-export const service = axios.create()
+export const googleLogin = axios.create()
 
-service.interceptors.request.use(
+googleLogin.interceptors.request.use(
     config => {
         const token = localStorage.getItem('token')
         config.headers.Token = token
@@ -92,7 +78,7 @@ service.interceptors.request.use(
         return Promise.reject(error)
     }
 )   
-service.interceptors.response.use(
+googleLogin.interceptors.response.use(
     res => {
         const result = fromJS(get(res, ['data', 'result']))
         const error_code = get(res, ["data", "error_code"])
@@ -107,18 +93,23 @@ service.interceptors.response.use(
 )
 
 // get list
-export const apiGetList = (params, dispatch) => service.get('/getList', { params }).then(({  result}) => {
+export const apiGetList = (params, dispatch) => googleLogin.get('/getList', { params }).then(({  result}) => {
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result})
 })
 
 // add list
-export const apiAddList = (data, dispatch) => service.put('/addList', data).then(({ error_code, result }) => {
+export const apiAddList = (data, dispatch) => googleLogin.put('/addList', data).then(({ error_code, result }) => {
     dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
 })
 
 
 // remove list
-export const apiDeleteList = (data,dispatch) =>service.put('/deleteList', data).then(({ result }) => {
+export const apiDeleteList = (data,dispatch) =>googleLogin.put('/deleteList', data).then(({ result }) => {
         dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
     })
 
+
+
+// line 
+
+export const apiLineLogin = ()=>axios.get('/line/login')

@@ -85,7 +85,7 @@ const ModalWarpper = styled(animated.div)`
     border-radius:10px;
     background: #e6f1f0;
     >div{
-    padding:20px 10px;
+    padding:10px 10px;
     }
   
 `

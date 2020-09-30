@@ -8,18 +8,19 @@ const startCrawler = (list = []) => {
             list.map(crawl)
         )
         globalStore.itemLists = lists
-        console.log(globalStore.itemLists);
+        console.log(globalStore.itemLists)
         return lists
     }
     iteralList()
-    setInterval(iteralList, 60 * 1000)
+    setInterval(iteralList, 5 * 60 * 1000)
 }
 
 
 function crawl(itemNum) {
     const url = `https://www.costco.com.tw/search?text=${itemNum}`
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
         request({ url }, function (error, response, body) {
+            console.log(body);
             if (error || !body) {
                 return
             }
@@ -46,7 +47,7 @@ function crawl(itemNum) {
             }
             resolve(data)
         })
-    });
+    })
 }
 
 module.exports = startCrawler

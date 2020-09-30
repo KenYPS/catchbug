@@ -1,25 +1,34 @@
 
-const express = require('express')
 require('dotenv').config()
-const app = express()
+require('./getBug')
+const express = require('express')
 const bodyParser = require('body-parser')
 const { admin } = require('./firebase')
-const { abstractAccount } = require('./Utils')
-require('./getBug')
-const globalStore = require('./store')
 const path = require('path')
+
+const {linebotParser} = require('./linebot')
+
+const globalStore = require('./store')
+const { abstractAccount } = require('./Utils')
+
 
 const { resCode } = globalStore
 
 const firebaseDB = admin.database()
 
+
+const app = express()
+
 if (process.env.NODE_ENV === 'production')
     app.use(express.static(path.join(__dirname, '../build')))
 
 
+app.post('/linewebhook', linebotParser);
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.raw())
+
 
 app.get('/getList', (req, res) => {
     const { site } = req.query
@@ -36,10 +45,10 @@ app.put('/addList', (req, res) => {
     const token = req.headers.token
     checkAuth(token, res).then(account => {
         if (resCode.error_code) {
-            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => new Promise((resolve, rej)=>{
+            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => new Promise((resolve, rej) => {
                 const userItemLists = snap.val()
                 if (userItemLists.includes(addValue)) rej({ msg: '商品已在列表' })
-                resolve([...userItemLists, addValue]) 
+                resolve([...userItemLists, addValue])
             })
             ).then(list => {
                 firebaseDB.ref(`${site}/${account}`).set(list, err => {
@@ -47,14 +56,14 @@ app.put('/addList', (req, res) => {
                         getUserItemList({ site, account, res })
                     }
                 })
-            },err=>{
-                console.log(err);
-                    const { msg} =err
-                    const errRes = { ...resCode}
-                    errRes.error_code = 999
-                    errRes.error_msg = msg
-                    errRes.result=[]
-                    res.send(errRes)
+            }, err => {
+                console.log(err)
+                const { msg } = err
+                const errRes = { ...resCode }
+                errRes.error_code = 999
+                errRes.error_msg = msg
+                errRes.result = []
+                res.send(errRes)
             })
         }
     })
@@ -95,6 +104,7 @@ const checkAuth = (token) => {
     })
 }
 
+
 function getUserItemList({ site, account, res }, data) {
     firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
         const { itemLists } = globalStore
@@ -107,6 +117,17 @@ function getUserItemList({ site, account, res }, data) {
         res.send(resCode)
     })
 }
+
+// ----------- line -----------
+
+
+app.get('/line/login', (req, res) => {
+   
+    res.send(resCode)
+
+})
+
+
 
 if (process.env.NODE_ENV === 'production')
     app.get('*', (req, res) => {

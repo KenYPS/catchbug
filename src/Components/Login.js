@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import ModalBox from 'Components/common/Modalbox'
 
-import {  useApiVerifyUser, useApiGoogleLogin } from 'api'
+import { useApiVerifyUser, useApiGoogleLogin, apiLineLogin } from 'api'
 
 
 export default ( ) => {
@@ -11,8 +11,19 @@ export default ( ) => {
     useApiVerifyUser(setModalOpen)
     const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
 
-    function handleLogin() {
+    function handleGoogleLogin() {
         apiGoogleLogin()
+    }
+    function handleLineLogin() {
+      const winOpen=  window.open()
+        var URL = 'https://access.line.me/oauth2/v2.1/authorize?'
+        URL += 'response_type=code'
+        URL += '&client_id=1654992288'
+        URL += '&redirect_uri=https://45387844df5e.ngrok.io'
+        URL += '&state=abcde'
+        URL += '&scope=openid%20profile'
+        winOpen.location.href = URL
+        apiLineLogin()
     }
 
     return <ModalBox
@@ -33,7 +44,14 @@ export default ( ) => {
                 onChange={e => setPassword(e.target.value)}/>
             </StyledInput> */}
             <ControlArea>
-                <Button onClick={handleLogin}>
+                <Button 
+                    color='#00b900'
+                onClick={handleLineLogin}>
+                    Line登入
+                </Button>
+                <Button 
+                    color='#00bcd4'
+                    onClick={handleGoogleLogin}>
                     Google登入
                 </Button>
             </ControlArea>
@@ -67,13 +85,15 @@ width:100%;
 display: flex;
 justify-content:center;
 align-items:center;
+flex-direction:column;
 `
 
 const Button = styled.button`
 width:90%;
 line-height:30px;
 border-radius:5px;
-background-color: #00bcd4;
+background-color: ${({color})=>color};
+margin:10px 0;
 cursor: pointer;
 :hover{
     opacity:0.7;
