@@ -3,16 +3,23 @@ import styled from 'styled-components'
 
 import ModalBox from 'Components/common/Modalbox'
 
+import {  useApiVerifyUser, useApiGoogleLogin } from 'api'
 
-export default ({ modalOpen, handleLogin}) => {
-    const [account, setAccount] = useState('')
-    const [password, setPassword] = useState('')
+
+export default ( ) => {
+    const [modalOpen, setModalOpen] = useState(false)
+    useApiVerifyUser(setModalOpen)
+    const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
+
+    function handleLogin() {
+        apiGoogleLogin()
+    }
 
     return <ModalBox
         isOpen={modalOpen}
     >
         <Container>
-            <StyledInput>
+            {/* <StyledInput>
                 <span>帳號</span>
                 <input autoFocus 
                     value={account}
@@ -24,10 +31,10 @@ export default ({ modalOpen, handleLogin}) => {
                 type='password'
                 value={password}
                 onChange={e => setPassword(e.target.value)}/>
-            </StyledInput>
+            </StyledInput> */}
             <ControlArea>
-                <Button onClick={() => handleLogin(account, password)}>
-                    登入
+                <Button onClick={handleLogin}>
+                    Google登入
                 </Button>
             </ControlArea>
 
@@ -42,19 +49,18 @@ text-align:center;
 `
 
 // style
-const StyledInput = styled.div`
-height: 25px;
-margin-bottom:10px;
->span{
-    margin-right:5px;
-}
->input{
-width:80%;
-height: 100%;
-padding-left: 5px;
-}
-
-`
+// const StyledInput = styled.div`
+// height: 25px;
+// margin-bottom:10px;
+// >span{
+//     margin-right:5px;
+// }
+// >input{
+// width:80%;
+// height: 100%;
+// padding-left: 5px;
+// }
+// `
 
 const ControlArea = styled.div`
 width:100%;

@@ -1,7 +1,7 @@
 import React, { memo } from "react"
-import styled, { keyframes } from 'styled-components'
+import styled, {  } from 'styled-components'
 import media from 'cssMix/index'
-import { Map } from 'immutable'
+import {  } from 'immutable'
 
 
 export default memo(({ list,

@@ -1,8 +1,7 @@
-import React, { useContext, useMemo } from "react"
+import React, {  } from "react"
 import styled from 'styled-components'
 import media from 'cssMix/index'
-import { ContextStore } from 'Reducer'
-import { Map, List, fromJS } from 'immutable'
+import {  fromJS } from 'immutable'
 
 // comp 
 import Items from './Items'
@@ -10,19 +9,17 @@ import Items from './Items'
 import { } from 'api'
 
 // util
-import { transToLowercaseAndTrim } from 'Utils/index'
+// import { transToLowercaseAndTrim } from 'Utils/index'
 
 const listItems = fromJS(['111', '333'])
 
 export default props => {
-    const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     return <Main>
         <Items
             list={listItems}
         />
     </Main>
 }
-
 
 // style
 const Main = styled.div`

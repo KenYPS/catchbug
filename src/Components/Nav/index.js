@@ -1,55 +1,52 @@
-import React, { useContext, useState, useEffect, useMemo, useRef } from "react"
+import React, { useContext, useEffect, } from "react"
 import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
-import { Map, List, fromJS } from 'immutable'
 
-// api
-import { useApiLogin } from 'api'
 
 // comp
 import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
-import Login from './Login'
 
+// api 
+import { apiLogOut } from 'api'
 export default props => {
-    const [modalOpen, setModalOpen] = useState(true)
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const activeNav = stateReducer.get('activeNav')
     const account = stateReducer.get('account')
     const menuList = stateReducer.get('menuList')
-    const apiLogin = useApiLogin(setModalOpen)
 
+
+    
     useEffect(() => {
         dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0, 'name']) })
     }, [dispatch, menuList])
 
-    function handleLogin(account, password) {
-        apiLogin(account, password)
-    }
-
     function handleAddClick(params) {
-        
+
     }
 
+    function handleSignOut(params) {
+        apiLogOut()
+    }
 
     return <Nav>
         <LoginArea>
             <div>
                 {account}
             </div>
-            {/* <button onClick={setModalOpen.bind(null, true)}>
-                {account ?'登出':'登入'}     
-            </button> */}
+            <button onClick={handleSignOut}>
+                登出
+            </button>
         </LoginArea>
-        <StyledSearchBar handleAddClick={handleAddClick}/>
+        <StyledSearchBar handleAddClick={handleAddClick} />
         <Menu
             list={menuList}
             activeNav={activeNav}
         />
-        <Login modalOpen={modalOpen}
+        {/* <Login modalOpen={modalOpen}
             handleLogin={handleLogin}
-        />
+        /> */}
     </Nav>
 }
 
@@ -69,8 +66,7 @@ ${media.tablet`
     position:relative;
     background-size:cover;
 `}
-${
-    media.mobile`
+${media.mobile`
     padding:10px 20px 0 20px;
     `
     }
