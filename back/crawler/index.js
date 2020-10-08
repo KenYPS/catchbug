@@ -14,8 +14,6 @@ const startCrawler = (list = []) => {
     iteralList()
     setInterval(iteralList, 5 * 60 * 1000)
 }
-
-
 function crawl(itemNum) {
     const url = `https://www.costco.com.tw/search?text=${itemNum}`
     return new Promise((resolve, reject) => {

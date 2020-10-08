@@ -5,7 +5,8 @@ const globalStore = {
         error_msg: "SUCCESS",
         log_id: "",
         result: []
-    }
+    },
+    users:[]
 };
 
 module.exports = globalStore;

@@ -4,8 +4,6 @@ import axios from 'axios'
 import { ContextStore } from 'Reducer'
 import { fromJS } from 'immutable'
 import get from 'lodash/get'
-import {  useLocation } from "react-router-dom"
-
 import '@firebase/auth'
 import '@firebase/database'
 
@@ -13,6 +11,8 @@ import { abstractAccount } from 'Utils'
 
 // firebase config
 import config from './config'
+
+import line_login from './common/lineLogin'
 
 // ifirebase
 firebase.initializeApp(config)
@@ -24,13 +24,14 @@ function logginedDispatch(user, setModalOpen, dispatch, site) {
         apiGetList({ site }, dispatch)
     });
     setModalOpen(false)
-    dispatch({ type: 'SET_DATA', path: 'account', value: account })
+    dispatch({ type: 'SET_DATA', path: 'account', value: account})
 }
 
 // verify isLogged in
 export const useApiVerifyUser = (setModalOpen) => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const site = stateReducer.getIn(['menuList', 0, 'name'])
+
     useEffect(() => {
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
@@ -66,9 +67,9 @@ export const apiLogOut = (dispatch) => {
 // -----------------------------------------
 // Axios
 
-export const googleLogin = axios.create()
+export const service = axios.create()
 
-googleLogin.interceptors.request.use(
+service.interceptors.request.use(
     config => {
         const token = localStorage.getItem('token')
         config.headers.Token = token
@@ -78,7 +79,8 @@ googleLogin.interceptors.request.use(
         return Promise.reject(error)
     }
 )   
-googleLogin.interceptors.response.use(
+
+service.interceptors.response.use(
     res => {
         const result = fromJS(get(res, ['data', 'result']))
         const error_code = get(res, ["data", "error_code"])
@@ -93,54 +95,57 @@ googleLogin.interceptors.response.use(
 )
 
 // get list
-export const apiGetList = (params, dispatch) => googleLogin.get('/getList', { params }).then(({  result}) => {
+export const apiGetList = (params, dispatch) => service.get('/getList', { params }).then(({  result}) => {
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result})
 })
 
 // add list
-export const apiAddList = (data, dispatch) => googleLogin.put('/addList', data).then(({ error_code, result }) => {
+export const apiAddList = (data, dispatch) => service.put('/addList', data).then(({ error_code, result }) => {
     dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
 })
 
 
 // remove list
-export const apiDeleteList = (data,dispatch) =>googleLogin.put('/deleteList', data).then(({ result }) => {
+export const apiDeleteList = (data,dispatch) =>service.put('/deleteList', data).then(({ result }) => {
         dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
     })
 
 
-
-
-
 // line 
-
-
-export const useLineLoggingCheck =()=>{
-    const afterQuery = new URLSearchParams(useLocation().search)
+export const useLineLoggingCheck = (setModalOpen, token)=>{
+    const { state: { stateReducer }, dispatch } = useContext(ContextStore)
+    const site = stateReducer.getIn(['menuList', 0, 'name'])
     const query = new URLSearchParams(window.location.search)
-    const checkCode = query.get('code')
-    const code = afterQuery.get('code')
+    const code = query.get('code') || token
+
     useEffect(()=>{
-        if (checkCode && !code) {
-            console.log(123);
-            window.location.href = window.location.origin + '/#/' + window.location.search
-        }
         if (code) {
-            console.log(code);
-            apiLineAuth({code})
+            service.defaults.headers.accessToken = code
+            apiLineAuth(setModalOpen, dispatch, site)
         }
-    },[checkCode, code])
+
+    },[code, dispatch, setModalOpen, site, token])
 }
 
 export const apiLineLogin = ()=>{
     let URL = `https://access.line.me/oauth2/v2.1/authorize?`
     URL += 'response_type=code'
-    URL += '&client_id=1654992288'
-    URL += '&redirect_uri=https://845f408d0a68.ngrok.io/'
+    URL += `&client_id=${line_login.client_id }`
+    URL += `&redirect_uri=${line_login.redirect_uri }`
     URL += '&state=123'
-    URL += '&scope=openid%20profile';
+    URL += '&scope=profile%20openid%20email';
     window.location.href = URL
-    
 }
 
-const apiLineAuth = (data)=>axios.post('/line/login', data)
+const apiLineAuth = ( setModalOpen, dispatch, site) => service.post('/line/login').then(({ result })=>{
+    const email = result.get('email','email')
+    const name = result.get('name', 'name')
+    const access_token = result.get('access_token', 'access_token')
+    const account = abstractAccount(email)
+    localStorage.setItem('access_token', access_token)
+    if (name){
+        apiGetList({ site }, dispatch)
+        dispatch({ type: 'SET_DATA', path: 'account', value: account})
+        setModalOpen(false)
+    }
+})

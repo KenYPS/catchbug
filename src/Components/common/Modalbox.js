@@ -77,7 +77,7 @@ const Wrapper = ({ children, isOpen = false, className, confirmModal }) => {
 const ModalWarpper = styled(animated.div)`
     box-sizing:border-box;
     width:296px;
-    margin:30% auto;
+    margin:20vh auto;
     z-index:110;
     background: #fff;
     max-height:90%;

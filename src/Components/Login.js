@@ -3,18 +3,21 @@ import styled from 'styled-components'
 
 import ModalBox from 'Components/common/Modalbox'
 
-import { useApiVerifyUser, useApiGoogleLogin, apiLineLogin } from 'api'
+import {  apiLineLogin, useLineLoggingCheck } from 'api'
+import useLocalStorage from 'useHooks/useLocalStorage'
 
+export default () => {
+    const [modalOpen, setModalOpen] = useState(true)
+    const [storedValue] = useLocalStorage('accessToken')
+    useLineLoggingCheck(setModalOpen, storedValue)
+    // useApiVerifyUser(setModalOpen)
 
-export default ( ) => {
-    const [modalOpen, setModalOpen] = useState(false)
-    useApiVerifyUser(setModalOpen)
-    const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
+    // const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
 
-    function handleGoogleLogin() {
-        apiGoogleLogin()
-    }
-    
+    // function handleGoogleLogin() {
+    //     apiGoogleLogin()
+    // }
+
     function handleLineLogin() {
         apiLineLogin()
     }
@@ -37,16 +40,16 @@ export default ( ) => {
                 onChange={e => setPassword(e.target.value)}/>
             </StyledInput> */}
             <ControlArea>
-                <Button 
+                <Button
                     color='#00b900'
-                onClick={handleLineLogin}>
+                    onClick={handleLineLogin}>
                     Line登入
                 </Button>
-                <Button 
+                {/* <Button 
                     color='#00bcd4'
                     onClick={handleGoogleLogin}>
                     Google登入
-                </Button>
+                </Button> */}
             </ControlArea>
 
         </Container>
@@ -85,7 +88,7 @@ const Button = styled.button`
 width:90%;
 line-height:30px;
 border-radius:5px;
-background-color: ${({color})=>color};
+background-color: ${({ color }) => color};
 margin:10px 0;
 cursor: pointer;
 :hover{

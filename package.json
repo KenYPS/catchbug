@@ -13,7 +13,9 @@
     "firebase-admin": "^9.1.1",
     "gaxios": "^3.2.0",
     "immutable": "^4.0.0-rc.12",
+    "jwt-decode": "^3.0.0",
     "linebot": "^1.6.0",
+    "node-fetch": "^2.6.1",
     "nodemon": "^2.0.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -22,6 +24,7 @@
     "react-scripts": "3.4.3",
     "react-spring": "^8.0.27",
     "react-transition-group": "^4.4.1",
+    "redis": "^3.0.2",
     "styled-components": "^5.1.1",
     "use-debounce": "^3.4.3"
   },
