@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import ModalBox from 'Components/common/Modalbox'
 
-import {  apiLineLogin, useLineLoggingCheck } from 'api'
+import {  lineLogin, useLineLoggingCheck } from 'api'
 import useLocalStorage from 'useHooks/useLocalStorage'
 
 export default () => {
@@ -19,7 +19,7 @@ export default () => {
     // }
 
     function handleLineLogin() {
-        apiLineLogin()
+        lineLogin()
     }
 
     return <ModalBox

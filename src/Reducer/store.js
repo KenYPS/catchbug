@@ -7,6 +7,7 @@ const initialState = fromJS({
     activeNav:'',
     searchValue:'',
     account:'',
+    naem:'',
     menuList: [{
         name: 'Costco',
     }],

@@ -1,12 +1,14 @@
+const error_code = require('./errorCode')
 const globalStore = { 
     itemList:[],
-    resCode: {
-        error_code: 1,
-        error_msg: "SUCCESS",
-        log_id: "",
-        result: []
-    },
+    resCode: (code, result = [])=>({
+        error_code: code,
+        error_msg: error_code[code],
+        result
+    }),
     users:[]
 };
 
 module.exports = globalStore;
+
+

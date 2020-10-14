@@ -8,6 +8,7 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const axios = require('axios')
 const url = require('url')
+var jwtDecoded = require('jwt-decode')
 
 const { admin } = require('./firebase')
 const { linebotParser } = require('./linebot')
@@ -120,7 +121,8 @@ function getUserItemList({ site, account, res }, data) {
 
 // ----------- line -----------
 app.post('/line/login', (req, res) => {
-    const code = req.headers.code
+    // const code = req.headers.code
+    const code = req.body.code
     let data = {
         grant_type: 'authorization_code',
         code: code,
@@ -130,49 +132,37 @@ app.post('/line/login', (req, res) => {
     }
     const params = new url.URLSearchParams(data)
     axios.post('https://api.line.me/oauth2/v2.1/token', params.toString()).then(restoken => {
-        const { id_token, access_token} = restoken.data
-
+        const { id_token, access_token } = restoken.data
+        const decoded = jwtDecoded(id_token)
+        const { name, email } = decoded
+        console.log(decoded)
         const data = {
-            id_token,
-            client_id: line_login.client_id
+            name,
+            email,
+            access_token
         }
-
-        const params = new url.URLSearchParams(data)
-        axios.post('https://api.line.me/oauth2/v2.1/verify', params).then(response => {
-            console.log('------------------------------------')
-            console.log(response.data)
-            const { email, name } = response.data
-            resCode.result = {
-                email,
-                name,
-                access_token
-            }
-            res.send(resCode)
-        })
+        const sendCode = resCode(1, data)
+        res.send(sendCode)
     }, err => {
-        console.log(err)
+        console.log(err.response.data)
     })
 })
 
-app.post('/line/auth', (res,req)=>{
-    const access_token = req.headers.accessToken
-    const params = {
-        access_token
-    }
-    lineUserAuth()
+app.post('/line/auth', (req, res) => {
+    const access_token = req.headers.token
+    lineUserAuth(access_token, res)
 })
 
 
-function lineUserAuth(id_token, client_id) {
-    const data = {
-        id_token,
-        client_id
-    }
-    const params = new url.URLSearchParams(data)
-    axios.get('https://api.line.me/oauth2/v2.1/verify', params).then(res => {
-        console.log(res)
+function lineUserAuth(access_token, res) {
+    axios.get(`https://api.line.me/oauth2/v2.1/verify?access_token=${access_token}`).then(response => {
+        console.log(response.data)
+        const sendCode = resCode(1)
+        res.send(sendCode)
     }
     ).catch(err => {
+        resCode.error_code = 2
+        res.send(resCode)
 
     }).then(res => {
 
