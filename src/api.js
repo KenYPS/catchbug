@@ -74,8 +74,12 @@ export const service = axios.create()
 service.interceptors.request.use(
     config => {
         const token = localStorage.getItem('access_token')
+        const idtoken = localStorage.getItem('id_token')
+
         console.log(token)
         config.headers.token = token
+        config.headers.idtoken = idtoken
+
         return config
     },
     error => {
@@ -98,7 +102,7 @@ service.interceptors.response.use(
 )
 
 // get list
-export const apiGetList = (params, dispatch) => service.get('/getList', { params }).then(({ result }) => {
+export const apiGetList = (params, dispatch) => service.get('/line/getList', { params }).then(({ result }) => {
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
 })
 
@@ -161,7 +165,8 @@ const apiLineLogin = (setModalOpen, dispatch, site, code) => {
     const data = qs.stringify(requestData)
     axios.post('https://api.line.me/oauth2/v2.1/token', data).then(res => {
         const { id_token, access_token } = res.data
-
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('id_token')
         localStorage.setItem('access_token', access_token)
         localStorage.setItem('id_token', id_token)
         loggedinAction({ setModalOpen, dispatch, site})
@@ -170,13 +175,12 @@ const apiLineLogin = (setModalOpen, dispatch, site, code) => {
     })
 }
 
-
 function loggedinAction({ dispatch, setModalOpen, site}) {
     const id_token = localStorage.getItem('id_token')
     const decoded = jwtDecoded(id_token)
-    const {  email } = decoded
-    const abEmail = abstractAccount(email)
-    dispatch({ type: 'SET_DATA', path: 'account', value: abEmail })
+    const {  auth_time, email } = decoded
+    
+    dispatch({ type: 'SET_DATA', path: 'account', value: email })
     apiGetList({ site }, dispatch)
     setModalOpen(false)
 }

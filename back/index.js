@@ -106,22 +106,9 @@ const checkAuth = (token) => {
 }
 
 
-function getUserItemList({ site, account, res }, data) {
-    firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
-        const { itemLists } = globalStore
-        const userItemLists = snap.val()
-        if (!userItemLists) {
-            firebaseDB.ref(`${site}`).update({ [account]: ['9987741'] })
-        }
-        data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
-        resCode.result = data
-        res.send(resCode)
-    })
-}
 
 // ----------- line -----------
 app.post('/line/login', (req, res) => {
-    // const code = req.headers.code
     const code = req.body.code
     let data = {
         grant_type: 'authorization_code',
@@ -131,6 +118,58 @@ app.post('/line/login', (req, res) => {
         client_secret: process.env.line_login_channelSecret
     }
     const params = new url.URLSearchParams(data)
+    getLineToken(params, res)
+})
+
+app.post('/line/auth', (req, res) => {
+    const access_token = req.headers.token
+    getlineUserAuth(access_token, res)
+})
+
+
+
+
+app.get('/line/getList', (req, res) => {
+    const { site } = req.query
+    const idtoken = req.headers.idtoken
+    const decoded = jwtDecoded(idtoken)
+    const { email } = decoded
+    const account = abstractAccount(email)
+
+    getUserItemList({ site, account, res })
+
+})
+
+
+
+
+
+// if (process.env.NODE_ENV === 'production')
+app.get('*', (req, res) => {
+    // res.redirect('/#/test')
+    // res.sendFile(path.join(__dirname + '../build/index.html'))
+})
+
+var server = app.listen(process.env.PORT || 5000, function () {
+    var port = server.address().port
+    console.log("Express is working on port " + port)
+})
+
+
+function getlineUserAuth(access_token, res) {
+    axios.get(`https://api.line.me/oauth2/v2.1/verify?access_token=${access_token}`).then(response => {
+        console.log(response.data)
+        const sendCode = resCode(1)
+        res.send(sendCode)
+    }
+    ).catch(err => {
+        const errCode = resCode(2)
+        res.send(errCode)
+    }).then(res => {
+    })
+}
+
+function getLineToken(params, res) {
     axios.post('https://api.line.me/oauth2/v2.1/token', params.toString()).then(restoken => {
         const { id_token, access_token } = restoken.data
         const decoded = jwtDecoded(id_token)
@@ -146,38 +185,29 @@ app.post('/line/login', (req, res) => {
     }, err => {
         console.log(err.response.data)
     })
-})
-
-app.post('/line/auth', (req, res) => {
-    const access_token = req.headers.token
-    lineUserAuth(access_token, res)
-})
-
-
-function lineUserAuth(access_token, res) {
-    axios.get(`https://api.line.me/oauth2/v2.1/verify?access_token=${access_token}`).then(response => {
-        console.log(response.data)
-        const sendCode = resCode(1)
-        res.send(sendCode)
-    }
-    ).catch(err => {
-        resCode.error_code = 2
-        res.send(resCode)
-
-    }).then(res => {
-
-    })
-
 }
 
+function getUserItemList({ site, account, res }, data) {
+    firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
+        const { itemLists } = globalStore
+        const userItemLists = snap.val()
+        if (!userItemLists) {
+            firebaseDB.ref(`${site}`).update({ [account]: ['9987741'] })
+        }
+        data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
+        resCode.result = data
+        const sendCode = resCode(1, data)
+        res.send(sendCode)
+    })
+}
 
-// if (process.env.NODE_ENV === 'production')
-app.get('*', (req, res) => {
-    // res.redirect('/#/test')
-    // res.sendFile(path.join(__dirname + '../build/index.html'))
-})
-
-var server = app.listen(process.env.PORT || 5000, function () {
-    var port = server.address().port
-    console.log("Express is working on port " + port)
-})
+function getUserProfile(access_token) {
+    axios.get('https://api.line.me/v2/profile', {
+        headers: {
+            Authorization: `Bearer ${access_token}`
+        }
+    }).then(res => {
+        const { userId } = res.data
+        console.log(userId)
+    })
+}
