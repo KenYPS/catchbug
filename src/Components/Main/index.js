@@ -16,14 +16,14 @@ export default props => {
     const { state: { stateReducer },dispatch } = useContext(ContextStore)
     const itemList = stateReducer.get('itemList', List)
     const site = stateReducer.getIn(['menuList', 0, 'name'])
-    const addValue = stateReducer.get('searchValue')
+    const addItemNum = stateReducer.get('searchValue')
     const filteredList = useMemo(()=> itemList.filter(v => {
         const itemNum = v.get('itemNum' ,'')
-        return itemNum.includes(addValue)
+        return itemNum.includes(addItemNum)
         })
-        , [itemList, addValue])
-    const handleRemoveClick = (itemNum) => {
-        apiDeleteList({ itemNum, site }, dispatch)
+        , [itemList, addItemNum])
+    const handleRemoveClick = (deleteItemNum) => {
+        apiDeleteList({ deleteItemNum, site }, dispatch)
     }
 
     const handleImgClick = (link) => {
@@ -35,7 +35,7 @@ export default props => {
         })
     }
     function handleAddClick() {
-        apiAddList({ addValue, site }, dispatch)
+        apiAddList({ addItemNum, site }, dispatch)
     }
     function handleRefresh() {
         apiGetList({ site }, dispatch)

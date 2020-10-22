@@ -1,20 +1,16 @@
 
 require('dotenv').config()
-require('./getBug')
-// require('./redis')
+require('./crawler/index')
 
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
 const axios = require('axios')
-const url = require('url')
-var jwtDecoded = require('jwt-decode')
 
 const { admin } = require('./firebase')
 const { linebotParser } = require('./linebot')
 const globalStore = require('./store')
 const { abstractAccount } = require('./Utils')
-const line_login = require('../src/common/lineLogin')
 
 const { resCode, users } = globalStore
 const firebaseDB = admin.database()
@@ -31,95 +27,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.raw())
 
-// --------- google ------------
 
-app.get('/getList', (req, res) => {
-    const { site } = req.query
-    const token = req.headers.token
-    checkAuth(token, res).then(account => {
-        if (resCode.error_code) {
-            getUserItemList({ site, account, res })
-        }
-    })
-})
-
-app.put('/addList', (req, res) => {
-    const { addValue, site } = req.body
-    const token = req.headers.token
-    checkAuth(token, res).then(account => {
-        if (resCode.error_code) {
-            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => new Promise((resolve, rej) => {
-                const userItemLists = snap.val()
-                if (userItemLists.includes(addValue)) rej({ msg: '商品已在列表' })
-                resolve([...userItemLists, addValue])
-            })
-            ).then(list => {
-                firebaseDB.ref(`${site}/${account}`).set(list, err => {
-                    if (!err) {
-                        getUserItemList({ site, account, res })
-                    }
-                })
-            }, err => {
-                console.log(err)
-                const { msg } = err
-                const errRes = { ...resCode }
-                errRes.error_code = 999
-                errRes.error_msg = msg
-                errRes.result = []
-                res.send(errRes)
-            })
-        }
-    })
-})
-
-
-app.put('/deleteList', (req, res) => {
-    const { itemNum, site } = req.body
-    const token = req.headers.token
-    checkAuth(token, res).then(account => {
-        if (resCode.error_code) {
-            firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
-                const userItemLists = snap.val()
-                return userItemLists.filter(v => v !== itemNum)
-            }).then(list => {
-                firebaseDB.ref(`${site}/${account}`).set(list, err => {
-                    if (!err) {
-                        getUserItemList({ site, account, res })
-                    }
-                })
-            })
-        }
-    })
-})
-
-
-// check auth before every connect
-const checkAuth = (token) => {
-    return admin.auth().verifyIdToken(token).then(res => {
-        const { email } = res
-        const account = abstractAccount(email)
-        return account
-    }, err => {
-        resCode.error_msg = err
-        return resCode
-    })
-}
 
 
 
 // ----------- line -----------
-app.post('/line/login', (req, res) => {
-    const code = req.body.code
-    let data = {
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: line_login.redirect_uri,
-        client_id: line_login.client_id,
-        client_secret: process.env.line_login_channelSecret
-    }
-    const params = new url.URLSearchParams(data)
-    getLineToken(params, res)
-})
+
 
 app.post('/line/auth', (req, res) => {
     const access_token = req.headers.token
@@ -127,21 +40,27 @@ app.post('/line/auth', (req, res) => {
 })
 
 
-
-
-app.get('/line/getList', (req, res) => {
+app.get('/getList', (req, res) => {
     const { site } = req.query
-    const idtoken = req.headers.idtoken
-    const decoded = jwtDecoded(idtoken)
-    const { email } = decoded
-    const account = abstractAccount(email)
-
-    getUserItemList({ site, account, res })
+    const access_token = req.headers.token
+    const userId = users[access_token].userId
+    firebaseGetUserItemList({ site, userId, res })
 
 })
 
+app.put('/addItem', (req, res) => {
+    const access_token = req.headers.token
+    const { addItemNum, site } = req.body
+    const userId = users[access_token].userId
+    firebaseAddList({ site, userId, res }, addItemNum)
+})
 
-
+app.put('/deleteItem', (req, res) => {
+    const access_token = req.headers.token
+    const { deleteItemNum, site } = req.body
+    const userId = users[access_token].userId
+    firebaseDeleteList({ site, userId, res }, deleteItemNum)
+})
 
 
 // if (process.env.NODE_ENV === 'production')
@@ -156,58 +75,109 @@ var server = app.listen(process.env.PORT || 5000, function () {
 })
 
 
+
+// line 
 function getlineUserAuth(access_token, res) {
     axios.get(`https://api.line.me/oauth2/v2.1/verify?access_token=${access_token}`).then(response => {
-        console.log(response.data)
-        const sendCode = resCode(1)
-        res.send(sendCode)
+        const { expires_in } = response.data
+        getUserProfile(access_token, expires_in).then(() => {
+            const sendCode = resCode(1)
+            res.send(sendCode)
+        })
     }
     ).catch(err => {
         const errCode = resCode(2)
         res.send(errCode)
-    }).then(res => {
     })
 }
 
-function getLineToken(params, res) {
-    axios.post('https://api.line.me/oauth2/v2.1/token', params.toString()).then(restoken => {
-        const { id_token, access_token } = restoken.data
-        const decoded = jwtDecoded(id_token)
-        const { name, email } = decoded
-        console.log(decoded)
-        const data = {
-            name,
-            email,
-            access_token
-        }
-        const sendCode = resCode(1, data)
-        res.send(sendCode)
-    }, err => {
-        console.log(err.response.data)
-    })
-}
-
-function getUserItemList({ site, account, res }, data) {
-    firebaseDB.ref(`${site}/${account}`).once('value').then(snap => {
-        const { itemLists } = globalStore
-        const userItemLists = snap.val()
-        if (!userItemLists) {
-            firebaseDB.ref(`${site}`).update({ [account]: ['9987741'] })
-        }
-        data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
-        resCode.result = data
-        const sendCode = resCode(1, data)
-        res.send(sendCode)
-    })
-}
-
-function getUserProfile(access_token) {
-    axios.get('https://api.line.me/v2/profile', {
+function getUserProfile(access_token, expires_in) {
+    return axios.get('https://api.line.me/v2/profile', {
         headers: {
             Authorization: `Bearer ${access_token}`
         }
     }).then(res => {
         const { userId } = res.data
-        console.log(userId)
+        users[access_token] = {}
+        users[access_token].setTimeout = setTimeout(() => {
+            delete users[access_token]
+        }, expires_in)
+
+        users[access_token].userId = userId
+    })
+}
+
+
+//  firebase
+function firebaseGetUserItemList({ site, userId, res }, data) {
+    const { itemLists } = globalStore
+    firebaseGetUserListPromise({ site, userId, res }).then((userItemLists = [], rej) => {
+        if (userItemLists.length === 0) {
+            firebaseDB.ref(`${site}`).update({ [userId]: ['9987741'] }).then(snapchat => {
+                data = itemLists.filter(v => snapchat.val().indexOf(v.itemNum) > -1)
+            })
+        } else {
+            data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
+        }
+        const sendCode = resCode(1, data)
+        res.send(sendCode)
+    })
+}
+
+
+function firebaseAddList({ site, userId, res }, itemNum) {
+    firebaseGetUserListPromise({ site, userId, res }).then((userItemLists, rej) => {
+        if (userItemLists.includes(itemNum)) {
+            const sendCode = resCode(1001)
+            res.status(400).send(sendCode)
+        } else {
+            const newUserItemList = [...userItemLists, itemNum]
+            firebaseSetUserNewListPromise({ site, userId, res }, newUserItemList)
+        }
+    }
+    )
+}
+
+function firebaseDeleteList({ site, userId, res }, itemNum) {
+    firebaseGetUserListPromise({ site, userId }).then(userItemLists => {
+        return userItemLists.filter(v => v !== itemNum)
+    })
+    firebaseDB.ref(`${site}/${userId}`).once('value').then(snap => {
+        const userItemLists = snap.val()
+        return userItemLists.filter(v => v !== itemNum)
+    }).then(newUserItemList => {
+        firebaseSetUserNewListPromise({ site, userId, res}, newUserItemList)
+    })
+}
+
+function firebaseGetUserListPromise({ site, userId }) {
+    return firebaseDB.ref(`${site}/${userId}`).once('value').then(snap => {
+        const userItemLists = snap.val()
+        return userItemLists
+    })
+}
+
+function firebaseSetUserNewListPromise({ site, userId, res }, newUserItemList) {
+    return firebaseDB.ref(`${site}/${userId}`).set(newUserItemList, err => {
+        if (!err) {
+            firebaseGetUserItemList({ site, userId, res })
+        }
+    })
+}
+
+
+
+
+
+
+// check auth before every connect
+const checkGoogleAuth = (token) => {
+    return admin.auth().verifyIdToken(token).then(res => {
+        const { email } = res
+        const account = abstractAccount(email)
+        return account
+    }, err => {
+        resCode.error_msg = err
+        return resCode
     })
 }

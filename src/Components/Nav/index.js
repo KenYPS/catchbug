@@ -8,7 +8,7 @@ import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
 
 // api 
-import { apiLogOut, apiAddList, apiGetList} from 'api'
+import { apiAddList, apiGetList} from 'api'
 
 
 export default props => {
@@ -16,7 +16,7 @@ export default props => {
     const activeNav = stateReducer.get('activeNav')
     const account = stateReducer.get('account')
     const menuList = stateReducer.get('menuList')
-    const addValue = stateReducer.get('searchValue')
+    const addItemNum = stateReducer.get('searchValue')
     const site = stateReducer.getIn(['menuList', 0, 'name'])
 
     useEffect(() => {
@@ -24,11 +24,11 @@ export default props => {
     }, [dispatch, menuList])
 
     function handleAddClick() {
-        apiAddList({ addValue, site }, dispatch)
+        apiAddList({ addItemNum, site }, dispatch)
     }
 
     function handleSignOut() {
-        apiLogOut(dispatch)
+        // apiLogOut(dispatch)
     }
     function handleRefresh() {
         apiGetList({ site }, dispatch)

@@ -19,10 +19,10 @@ bot.on('message', function (event) {
 });
 
 bot.on('join',event=>{
-    console.log(event);
     const userId = event.sourcer.userId
     bot.getUserProfile(userId).then(res=>{
-        console.log(res);
+        event.reply(`哈囉!歡迎加入本群組。如果想要新增品項，請登入以下網址
+        `)
     })
 } )
 
