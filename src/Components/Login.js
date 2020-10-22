@@ -4,12 +4,10 @@ import styled from 'styled-components'
 import ModalBox from 'Components/common/Modalbox'
 
 import {  lineLogin, useLineLoggingCheck } from 'api'
-import useLocalStorage from 'useHooks/useLocalStorage'
 
 export default () => {
     const [modalOpen, setModalOpen] = useState(true)
-    const [storedValue] = useLocalStorage('accessToken')
-    useLineLoggingCheck(setModalOpen, storedValue)
+    useLineLoggingCheck(setModalOpen)
     // useApiVerifyUser(setModalOpen)
 
     // const apiGoogleLogin = useApiGoogleLogin(setModalOpen)

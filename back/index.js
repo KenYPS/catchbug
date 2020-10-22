@@ -34,6 +34,13 @@ app.use(bodyParser.raw())
 // ----------- line -----------
 
 
+// app.get('/', (req, res) => {
+//    const params = req.params
+//     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl+'/#/'+params;
+//     console.log(fullUrl);
+//     res.redirect(fullUrl);
+// })
+
 app.post('/line/auth', (req, res) => {
     const access_token = req.headers.token
     getlineUserAuth(access_token, res)
@@ -65,7 +72,6 @@ app.put('/deleteItem', (req, res) => {
 
 // if (process.env.NODE_ENV === 'production')
 app.get('*', (req, res) => {
-    // res.redirect('/#/test')
     // res.sendFile(path.join(__dirname + '../build/index.html'))
 })
 

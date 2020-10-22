@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react'
+import { useEffect, useContext, useState } from 'react'
 import axios from 'axios'
 import { ContextStore } from 'Reducer'
 import { fromJS } from 'immutable'
@@ -8,6 +8,7 @@ import '@firebase/database'
 import qs from 'querystring'
 import jwtDecoded from 'jwt-decode'
 
+import useLocalStorage from 'useHooks/useLocalStorage'
 
 import line_login from './common/lineLogin'
 
@@ -18,8 +19,8 @@ service.interceptors.request.use(
     config => {
         const token = localStorage.getItem('access_token')
         const idtoken = localStorage.getItem('id_token')
-        config.headers.token = token
-        config.headers.idtoken = idtoken
+        config.headers.token = JSON.parse(token)
+        config.headers.idtoken = JSON.parse(idtoken)
         return config
     },
     error => {
@@ -36,8 +37,8 @@ service.interceptors.response.use(
         return { result, error_code, error_msg }
     },
     error => {
-        const result = fromJS(get(error, ['response','data', 'result']))
-        const error_code = get(error, ['response',"data", "error_code"])
+        // const result = fromJS(get(error, ['response','data', 'result']))
+        // const error_code = get(error, ['response',"data", "error_code"])
         const error_msg = get(error, ['response',"data", "error_msg"])
         console.error({...error})
         alert(error_msg)
@@ -48,23 +49,34 @@ service.interceptors.response.use(
 
 
 // line 
-export const useLineLoggingCheck = (setModalOpen, token) => {
+export const useLineLoggingCheck = (setModalOpen,) => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
+
+    const [storageAccessToken, setStorageAccessToken] = useLocalStorage('access_token')
+    const [storageIdToken, setStorageIdToken] = useLocalStorage('id_token')
+    const [code] = useState(new URLSearchParams(window.location.search).get('code'))
     const site = stateReducer.getIn(['menuList', 0, 'name'])
-    const query = new URLSearchParams(window.location.search)
-    const code = query.get('code') || token
-    const access_token = localStorage.getItem('access_token', '')
 
     useEffect(() => {
-        if (access_token && !code) {
-            service.defaults.headers.accessToken = access_token
-            apiLineAuth(setModalOpen, dispatch, site)
-        } else if (code && !access_token) {
-            apiLineLogin(setModalOpen, dispatch, site, code)
+        if (storageAccessToken) {
+            console.log(123);
+            apiLineAuth(setModalOpen, dispatch, site, storageIdToken)
+        } else if (code && !storageAccessToken) {
+            console.log(33333);
+            apiLineLogin({setModalOpen, dispatch, site, code, setStorageAccessToken, setStorageIdToken } )
         }
+    }, [code, dispatch, setModalOpen, setStorageAccessToken, setStorageIdToken, site, storageAccessToken, storageIdToken])
+    useEffect(()=>{
 
-    }, [access_token, code, dispatch, setModalOpen, site])
+    console.log(1111111);
+        console.log(setStorageAccessToken);
+    }, [setStorageAccessToken])
 
+    useEffect(()=>{
+        console.log(22222222);
+        console.log(setStorageIdToken);
+
+    }, [setStorageIdToken])
 }
 
 export const lineLogin = () => {
@@ -94,28 +106,27 @@ export const apiDeleteList = (data, dispatch) => service.put('/deleteItem', data
 })
 
 
-const apiLineAuth = (setModalOpen, dispatch, site) => service.post('/line/auth').then(({ result }) => {
-    loggedinAction({ setModalOpen, dispatch, site })
+const apiLineAuth = (setModalOpen, dispatch, site, storageIdToken) => service.post('/line/auth').then(({ result }) => {
+    loggedinAction({ setModalOpen, dispatch, site, storageIdToken})
 })
 
 
-const apiLineLogin = (setModalOpen, dispatch, site, code) => {
+const apiLineLogin = ({setModalOpen, dispatch, site, code, setStorageAccessToken, setStorageIdToken}) => {
     let requestData = {
         grant_type: 'authorization_code',
         code: code,
         redirect_uri: line_login.redirect_uri,
         client_id: line_login.client_id,
-        client_secret: process.env.REACT_APP_apiKey
+        client_secret: process.env.REACT_APP_client_secret
     }
 
     const data = qs.stringify(requestData)
     axios.post('https://api.line.me/oauth2/v2.1/token', data).then(res => {
         const { id_token, access_token } = res.data
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('id_token')
-        localStorage.setItem('access_token', access_token)
-        localStorage.setItem('id_token', id_token)
-        loggedinAction({ setModalOpen, dispatch, site})
+        console.log(id_token);
+        setStorageAccessToken(access_token)
+        setStorageIdToken(id_token)
+        apiLineAuth(setModalOpen, dispatch, site)
     }, err => {
         console.log(err.response.data)
     })
@@ -123,11 +134,9 @@ const apiLineLogin = (setModalOpen, dispatch, site, code) => {
 
 
 
-function loggedinAction({ dispatch, setModalOpen, site}) {
-    const id_token = localStorage.getItem('id_token')
-    const decoded = jwtDecoded(id_token)
-    const {  auth_time, email } = decoded
-    
+function loggedinAction({ dispatch, setModalOpen, site, storageIdToken}) {
+    const decoded = jwtDecoded(storageIdToken)
+    const { email } = decoded
     dispatch({ type: 'SET_DATA', path: 'account', value: email })
     apiGetList({ site }, dispatch)
     setModalOpen(false)

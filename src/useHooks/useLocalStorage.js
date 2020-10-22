@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function useLocalStorage(key, initialValue) {
     // State to store our value
@@ -17,19 +17,18 @@ function useLocalStorage(key, initialValue) {
             return initialValue
         }
     })
+  
+    useEffect(()=>{
+        const valueToStore =
+            storedValue instanceof Function ? storedValue(storedValue) : storedValue
+        if (valueToStore)
+        localStorage.setItem(key, JSON.stringify(valueToStore))
+        else
+        localStorage.removeItem(key)
+    }, [key, storedValue])
 
-    const setValue = value => {
-        try {
-            const valueToStore =
-                value instanceof Function ? value(storedValue) : value
-            setStoredValue(valueToStore)
-           localStorage.setItem(key, JSON.stringify(valueToStore))
-        } catch (err) {
-            console.error(err)
-        }
-    }
 
-    return [storedValue, setValue];
+    return [storedValue, setStoredValue];
 }
 
 
