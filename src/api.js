@@ -133,7 +133,6 @@ const apiLineLogin = ({setModalOpen, dispatch, site, code, setStorageAccessToken
 }
 
 
-
 function loggedinAction({ dispatch, setModalOpen, site, storageIdToken}) {
     const decoded = jwtDecoded(storageIdToken)
     const { email } = decoded
