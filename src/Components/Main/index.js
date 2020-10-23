@@ -1,27 +1,41 @@
-import React, { useContext, useMemo } from "react"
+import React, { useContext, useMemo, useRef, useState } from "react"
 import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
-import {List } from 'immutable'
+import { List } from 'immutable'
+
 // comp 
 import Items from './Items'
 import Search from './Search'
+
 // api
-import { apiDeleteList, apiAddList, apiGetList} from 'api'
+import { apiDeleteList, apiAddList, apiGetList } from 'api'
 
 // util
 // import { transToLowercaseAndTrim } from 'Utils/index'
 
+import useOutsideClickListener from 'useHooks/useOutsideClickListener'
+
 export default props => {
-    const { state: { stateReducer },dispatch } = useContext(ContextStore)
+    const { state: { stateReducer }, dispatch } = useContext(ContextStore)
     const itemList = stateReducer.get('itemList', List)
     const site = stateReducer.getIn(['menuList', 0, 'name'])
     const addItemNum = stateReducer.get('searchValue')
-    const filteredList = useMemo(()=> itemList.filter(v => {
-        const itemNum = v.get('itemNum' ,'')
+
+    const [reomoveButtonSeq, setReomoveButtonSeq] = useState()
+
+    const popRef = useRef()
+    const clickElementRef = useRef()
+
+    const filteredList = useMemo(() => itemList.filter(v => {
+        const itemNum = v.get('itemNum', '')
         return itemNum.includes(addItemNum)
-        })
+    })
         , [itemList, addItemNum])
+
+    useOutsideClickListener(popRef, setReomoveButtonSeq.bind(null, ''), clickElementRef)
+
+
     const handleRemoveClick = (deleteItemNum) => {
         apiDeleteList({ deleteItemNum, site }, dispatch)
     }
@@ -41,11 +55,15 @@ export default props => {
         apiGetList({ site }, dispatch)
     }
     return <Main>
-        <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh}/>
+        <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh} />
         <Items
+            popRef={popRef}
+            clickElementRef={clickElementRef}
             list={filteredList}
             handleRemoveClick={handleRemoveClick}
             handleImgClick={handleImgClick}
+            reomoveButtonSeq={reomoveButtonSeq}
+            setReomoveButtonSeq={setReomoveButtonSeq}
         />
     </Main>
 }

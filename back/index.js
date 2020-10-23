@@ -1,4 +1,3 @@
-
 require('dotenv').config()
 require('./crawler/index')
 
@@ -29,10 +28,7 @@ app.use(bodyParser.raw())
 
 
 
-
-
 // ----------- line -----------
-
 
 // app.get('/', (req, res) => {
 //    const params = req.params
@@ -118,13 +114,10 @@ function getUserProfile(access_token, expires_in) {
 function firebaseGetUserItemList({ site, userId, res }, data) {
     const { itemLists } = globalStore
     firebaseGetUserListPromise({ site, userId, res }).then((userItemLists = [], rej) => {
-        if (userItemLists.length === 0) {
-            firebaseDB.ref(`${site}`).update({ [userId]: ['9987741'] }).then(snapchat => {
-                data = itemLists.filter(v => snapchat.val().indexOf(v.itemNum) > -1)
-            })
-        } else {
-            data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
-        }
+
+        console.log(userItemLists)
+        data = itemLists.filter(v => userItemLists.indexOf(v.itemNum) > -1)
+
         const sendCode = resCode(1, data)
         res.send(sendCode)
     })
@@ -152,14 +145,22 @@ function firebaseDeleteList({ site, userId, res }, itemNum) {
         const userItemLists = snap.val()
         return userItemLists.filter(v => v !== itemNum)
     }).then(newUserItemList => {
-        firebaseSetUserNewListPromise({ site, userId, res}, newUserItemList)
+        firebaseSetUserNewListPromise({ site, userId, res }, newUserItemList)
     })
 }
 
 function firebaseGetUserListPromise({ site, userId }) {
     return firebaseDB.ref(`${site}/${userId}`).once('value').then(snap => {
         const userItemLists = snap.val()
-        return userItemLists
+        
+        // if new user give default list in firebase
+        if (!userItemLists) {
+            firebaseDB.ref(`${site}`).update({ [userId]: ['9987741'] }).then(() => {
+                firebaseGetUserListPromise({ site, userId })
+            })
+        } else {
+            return userItemLists
+        }
     })
 }
 

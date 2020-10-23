@@ -39,8 +39,8 @@ service.interceptors.response.use(
     error => {
         // const result = fromJS(get(error, ['response','data', 'result']))
         // const error_code = get(error, ['response',"data", "error_code"])
-        const error_msg = get(error, ['response',"data", "error_msg"])
-        console.error({...error})
+        const error_msg = get(error, ['response', "data", "error_msg"])
+        console.error({ ...error })
         alert(error_msg)
         return Promise.reject(error)
     }
@@ -51,7 +51,6 @@ service.interceptors.response.use(
 // line 
 export const useLineLoggingCheck = (setModalOpen,) => {
     const { state: { stateReducer }, dispatch } = useContext(ContextStore)
-
     const [storageAccessToken, setStorageAccessToken] = useLocalStorage('access_token')
     const [storageIdToken, setStorageIdToken] = useLocalStorage('id_token')
     const [code] = useState(new URLSearchParams(window.location.search).get('code'))
@@ -59,33 +58,23 @@ export const useLineLoggingCheck = (setModalOpen,) => {
 
     useEffect(() => {
         if (storageAccessToken) {
-            console.log(123);
             apiLineAuth(setModalOpen, dispatch, site, storageIdToken)
         } else if (code && !storageAccessToken) {
-            console.log(33333);
-            apiLineLogin({setModalOpen, dispatch, site, code, setStorageAccessToken, setStorageIdToken } )
+            apiLineLogin({ setModalOpen, dispatch, site, code, setStorageAccessToken, setStorageIdToken })
         }
     }, [code, dispatch, setModalOpen, setStorageAccessToken, setStorageIdToken, site, storageAccessToken, storageIdToken])
-    useEffect(()=>{
 
-    console.log(1111111);
-        console.log(setStorageAccessToken);
-    }, [setStorageAccessToken])
-
-    useEffect(()=>{
-        console.log(22222222);
-        console.log(setStorageIdToken);
-
-    }, [setStorageIdToken])
 }
 
 export const lineLogin = () => {
-    let URL = `https://access.line.me/oauth2/v2.1/authorize?`
-    URL += 'response_type=code'
-    URL += `&client_id=${line_login.client_id}`
-    URL += `&redirect_uri=${line_login.redirect_uri}`
-    URL += '&state=123'
-    URL += '&scope=profile%20openid%20email'
+    const query = qs.stringify({
+        response_type: 'code',
+        client_id: line_login.client_id,
+        redirect_uri: line_login.redirect_uri,
+        state: 123,
+        scope: 'profile%20openid%20email'
+    })
+    const URL = `https://access.line.me/oauth2/v2.1/authorize?${query}`
     window.location.href = URL
 }
 // get list
@@ -95,8 +84,7 @@ export const apiGetList = (params, dispatch) => service.get('/getList', { params
 
 // add list
 export const apiAddList = (data, dispatch) => service.put('/addItem', data).then(({ error_code, result }) => {
-  
-},err=>{}).then(()=>{
+}, err => { }).then(() => {
     dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
 })
 
@@ -107,11 +95,11 @@ export const apiDeleteList = (data, dispatch) => service.put('/deleteItem', data
 
 
 const apiLineAuth = (setModalOpen, dispatch, site, storageIdToken) => service.post('/line/auth').then(({ result }) => {
-    loggedinAction({ setModalOpen, dispatch, site, storageIdToken})
+    loggedinAction({ setModalOpen, dispatch, site, storageIdToken })
 })
 
 
-const apiLineLogin = ({setModalOpen, dispatch, site, code, setStorageAccessToken, setStorageIdToken}) => {
+const apiLineLogin = ({ setModalOpen, dispatch, site, code, setStorageAccessToken, setStorageIdToken }) => {
     let requestData = {
         grant_type: 'authorization_code',
         code: code,
@@ -123,7 +111,7 @@ const apiLineLogin = ({setModalOpen, dispatch, site, code, setStorageAccessToken
     const data = qs.stringify(requestData)
     axios.post('https://api.line.me/oauth2/v2.1/token', data).then(res => {
         const { id_token, access_token } = res.data
-        console.log(id_token);
+        console.log(id_token)
         setStorageAccessToken(access_token)
         setStorageIdToken(id_token)
         apiLineAuth(setModalOpen, dispatch, site)
@@ -133,7 +121,7 @@ const apiLineLogin = ({setModalOpen, dispatch, site, code, setStorageAccessToken
 }
 
 
-function loggedinAction({ dispatch, setModalOpen, site, storageIdToken}) {
+function loggedinAction({ dispatch, setModalOpen, site, storageIdToken }) {
     const decoded = jwtDecoded(storageIdToken)
     const { email } = decoded
     dispatch({ type: 'SET_DATA', path: 'account', value: email })

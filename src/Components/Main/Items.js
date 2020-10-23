@@ -1,12 +1,15 @@
-import React, { memo, useState } from "react"
+import React, { memo } from "react"
 import styled, { } from 'styled-components'
 import media from 'cssMix/index'
 import { BsThreeDots } from 'react-icons/bs'
 export default memo(({ list,
     handleImgClick,
-    handleRemoveClick
+    handleRemoveClick,
+    popRef,
+    clickElementRef,
+    reomoveButtonSeq,
+    setReomoveButtonSeq
 }) => {
-    const [menu, setMenu] = useState()
     return <GamesContainer>
         {
             list.map((v, i) => {
@@ -19,17 +22,17 @@ export default memo(({ list,
                 return <ItemCard key={i}
                     backgroundImg={itemImg}
                 >
-                    <div className='gameCardNum'>
+                    <div className='gameCardNum' ref={clickElementRef}>
                         {itemNum}
-                        <BsThreeDots onClick={() => setMenu(pre=> !!pre ? '' : itemNum)} />
-                        {menu === itemNum && <div className={`gameCardMenu`} onClick={handleRemoveClick.bind(null,itemNum)}>
+                        <BsThreeDots onClick={() => setReomoveButtonSeq(pre=> !!pre ? '' : itemNum)} />
+                        {reomoveButtonSeq === itemNum && <div ref={popRef} className={`gameCardMenu`} onClick={handleRemoveClick.bind(null,itemNum)}>
                             移除項目
                         </div>}
                     </div>
                     <div className='gameCardimg' onClick={() => handleImgClick(itemLink)} >
                         {
                             itemStockStatus ? <div className='maintain'>
-                                <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' />
+                                {/* <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' /> */}
                                 <div>缺貨</div>
                             </div> : <div className='hoverBg'>
                                     <div>進入網站</div>

@@ -9,24 +9,24 @@ var bot = linebot({
 bot.on('message', function (event) {
     // get user message from `event.message.text`
     // reply same message
-    console.log(event);
+    console.log(event)
     var replyMsg = `${event.message.text}`
-    event.reply(replyMsg).then(function (data) {
+    event.reply(replyMsg).then(function (dat) {
         console.log('ok')
     }).catch(function (error) {
         console.error(error)
     })
-});
+})
 
-bot.on('join',event=>{
+bot.on('join', event => {
     const userId = event.sourcer.userId
-    bot.getUserProfile(userId).then(res=>{
+    bot.getUserProfile(userId).then(res => {
         event.reply(`哈囉!歡迎加入本群組。如果想要新增品項，請登入以下網址
         `)
     })
-} )
+})
 
-const linebotParser = bot.parser();
+const linebotParser = bot.parser()
 module.exports = {
     linebotParser,
     bot
