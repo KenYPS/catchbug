@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo } from 'react'
 import styled, { } from 'styled-components'
 import media from 'cssMix/index'
 import { BsThreeDots } from 'react-icons/bs'
@@ -6,9 +6,12 @@ import { BsThreeDots } from 'react-icons/bs'
 function Items ({
   list,
   handleImgClick,
-  handleRemoveClick
+  handleRemoveClick,
+  popRef,
+  clickElementRef,
+  reomoveButtonSeq,
+  setReomoveButtonSeq
 }) {
-  const [menu, setMenu] = useState()
   return <GamesContainer>
     {
       list.map((v, i) => {
@@ -23,8 +26,8 @@ function Items ({
         >
           <div className='gameCardNum'>
             {itemNum}
-            <BsThreeDots onClick={() => setMenu(pre => pre ? '' : itemNum)} />
-            {menu === itemNum && <div className={'gameCardMenu'} onClick={handleRemoveClick.bind(null, itemNum)}>
+            <BsThreeDots ref={clickElementRef} onClick={() => setReomoveButtonSeq(pre => pre ? '' : itemNum)} />
+            {reomoveButtonSeq === itemNum && <div ref={popRef} className={'gameCardMenu'} onClick={handleRemoveClick.bind(null, itemNum)}>
                             移除項目
             </div>}
           </div>

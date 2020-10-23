@@ -39,6 +39,7 @@ app.use(bodyParser.raw())
 
 app.post('/line/auth', (req, res) => {
     const access_token = req.headers.token
+    console.log(access_token);
     getlineUserAuth(access_token, res)
 })
 
@@ -80,6 +81,7 @@ var server = app.listen(process.env.PORT || 5000, function () {
 
 // line 
 function getlineUserAuth(access_token, res) {
+    console.log(access_token);
     axios.get(`https://api.line.me/oauth2/v2.1/verify?access_token=${access_token}`).then(response => {
         const { expires_in } = response.data
         getUserProfile(access_token, expires_in).then(() => {
@@ -88,6 +90,7 @@ function getlineUserAuth(access_token, res) {
         })
     }
     ).catch(err => {
+        // console.log(err);
         const errCode = resCode(2)
         res.send(errCode)
     })

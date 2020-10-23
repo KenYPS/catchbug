@@ -9,13 +9,15 @@ import qs from 'querystring'
 import jwtDecoded from 'jwt-decode'
 
 import lineLoginConfig from 'common/lineLoginConfig'
+import useLocalStorage from 'useHooks/useLocalStorage'
 
 export const service = axios.create()
 
 service.interceptors.request.use(
   config => {
-    config.headers.token = localStorage.getItem('access_token')
-    config.headers.idtoken = localStorage.getItem('id_token')
+    config.headers.token = localStorage.getItem('accessToken')
+    config.headers.idtoken = localStorage.getItem('idToken')
+    console.log(localStorage.getItem('accessToken'))
     return config
   },
   error => Promise.reject(error)
@@ -39,32 +41,38 @@ service.interceptors.response.use(
 )
 
 // line
-export const useLineLoggingCheck = (setModalOpen, token) => {
+export const useLineLoggingCheck = (setModalOpen) => {
   const { state: { stateReducer }, dispatch } = useContext(ContextStore)
   const site = stateReducer.getIn(['menuList', 0, 'name'])
-  const query = qs.parse(window.location.search, { ignoreQueryPrefix: true })
-  const code = query.get('code') || token
-  const accessToken = localStorage.getItem('access_token')
+  const [accessToken, setAccessToken] = useLocalStorage('accessToken')
+  const [idToken, setIdToken] = useLocalStorage('idToken')
+  const query = qs.parse(window.location.search.substring(1))
+  const code = query.code
 
   useEffect(() => {
-    if (accessToken && !code) {
-      service.defaults.headers.accessToken = accessToken
-      apiLineAuth(setModalOpen, dispatch, site)
+    if (accessToken) {
+      apiLineAuth(setModalOpen, dispatch, site, idToken)
     } else if (code && !accessToken) {
-      apiLineLogin(setModalOpen, dispatch, site, code)
+      apiLineLogin(setModalOpen, dispatch, site, code, setAccessToken, setIdToken)
     }
-  }, [accessToken, code, dispatch, setModalOpen, site])
+  }, [accessToken, code, dispatch, idToken, setAccessToken, setIdToken, setModalOpen, site])
 }
 
 export const lineLogin = () => {
-  const search = qs.stringify({
-    response_type: 'code',
-    client_id: lineLoginConfig.client_id,
-    redirect_uri: lineLoginConfig.redirect_uri,
-    state: '123',
-    scope: 'profile+openid+email'
-  })
-  const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?${search}`
+  // const search = qs.stringify({
+  //   response_type: 'code',
+  //   client_id: lineLoginConfig.client_id,
+  //   redirect_uri: lineLoginConfig.redirect_uri,
+  //   state: '123',
+  //   scope: 'profile%20openid%20email'
+  // })
+  // console.log(search)
+  let lineAuthUrl = 'https://access.line.me/oauth2/v2.1/authorize?'
+  lineAuthUrl += 'response_type=code'
+  lineAuthUrl += `&client_id=${lineLoginConfig.client_id}`
+  lineAuthUrl += `&redirect_uri=${lineLoginConfig.redirect_uri}`
+  lineAuthUrl += '&state=123'
+  lineAuthUrl += '&scope=profile%20openid%20email'
   window.location.href = lineAuthUrl
 }
 // get list
@@ -88,37 +96,33 @@ export const apiDeleteList = (data, dispatch) => service
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
   })
 
-const apiLineAuth = (setModalOpen, dispatch, site) => service
+const apiLineAuth = (setModalOpen, dispatch, site, idToken) => service
   .post('/line/auth')
   .then(({ result }) => {
-    loggedinAction({ setModalOpen, dispatch, site })
+    loggedinAction({ setModalOpen, dispatch, site, idToken })
   })
 
-const apiLineLogin = (setModalOpen, dispatch, site, code) => {
+const apiLineLogin = (setModalOpen, dispatch, site, code, setAccessToken, setIdToken) => {
   const requestData = {
     grant_type: 'authorization_code',
     code: code,
     redirect_uri: lineLoginConfig.redirect_uri,
     client_id: lineLoginConfig.client_id,
-    client_secret: process.env.REACT_APP_apiKey
+    client_secret: process.env.REACT_APP_client_secret
   }
-
   const data = qs.stringify(requestData)
   axios.post('https://api.line.me/oauth2/v2.1/token', data)
     .then(res => {
       const { id_token: idToken, access_token: accessToken } = res.data
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('id_token')
-      localStorage.setItem('access_token', accessToken)
-      localStorage.setItem('id_token', idToken)
-      loggedinAction({ setModalOpen, dispatch, site })
+      setAccessToken(accessToken)
+      setIdToken(idToken)
+      loggedinAction({ setModalOpen, dispatch, site, idToken })
     }, err => {
       console.log(err.response.data)
     })
 }
 
-function loggedinAction ({ dispatch, setModalOpen, site }) {
-  const idToken = localStorage.getItem('id_token')
+function loggedinAction ({ dispatch, setModalOpen, site, idToken }) {
   const decoded = jwtDecoded(idToken)
   const { email } = decoded
 

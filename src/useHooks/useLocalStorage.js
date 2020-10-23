@@ -20,8 +20,8 @@ function useLocalStorage (key, initialValue) {
 
   useEffect(() => {
     const valueToStore =
-            storedValue instanceof Function ? storedValue(storedValue) : storedValue
-    if (valueToStore) { localStorage.setItem(key, JSON.stringify(valueToStore)) } else { localStorage.removeItem(key) }
+      storedValue instanceof Function ? storedValue(storedValue) : storedValue
+    if (valueToStore) { localStorage.setItem(key, valueToStore) } else { localStorage.removeItem(key) }
   }, [key, storedValue])
 
   return [storedValue, setStoredValue]
