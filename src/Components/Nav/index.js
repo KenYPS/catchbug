@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, } from "react"
+import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
@@ -7,54 +7,53 @@ import { ContextStore } from 'Reducer'
 import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
 
-// api 
-import { apiAddList, apiGetList} from 'api'
+// api
+import { apiAddList, apiGetList } from 'api'
 
+export default function Nav () {
+  const { state: { stateReducer }, dispatch } = useContext(ContextStore)
+  const activeNav = stateReducer.get('activeNav')
+  const account = stateReducer.get('account')
+  const menuList = stateReducer.get('menuList')
+  const addItemNum = stateReducer.get('searchValue')
+  const site = stateReducer.getIn(['menuList', 0, 'name'])
 
-export default props => {
-    const { state: { stateReducer }, dispatch } = useContext(ContextStore)
-    const activeNav = stateReducer.get('activeNav')
-    const account = stateReducer.get('account')
-    const menuList = stateReducer.get('menuList')
-    const addItemNum = stateReducer.get('searchValue')
-    const site = stateReducer.getIn(['menuList', 0, 'name'])
+  useEffect(() => {
+    dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0, 'name']) })
+  }, [dispatch, menuList])
 
-    useEffect(() => {
-        dispatch({ type: 'SET_DATA', path: 'activeNav', value: menuList.getIn([0, 'name']) })
-    }, [dispatch, menuList])
+  function handleAddClick () {
+    apiAddList({ addItemNum, site }, dispatch)
+  }
 
-    function handleAddClick() {
-        apiAddList({ addItemNum, site }, dispatch)
-    }
-
-    function handleSignOut() {
-        // apiLogOut(dispatch)
-    }
-    function handleRefresh() {
-        apiGetList({ site }, dispatch)
-    }
-    return <Nav>
-        <LoginArea>
-            <div>
-                {account}
-            </div>
-            <button onClick={handleSignOut}>
+  function handleSignOut () {
+    // apiLogOut(dispatch)
+  }
+  function handleRefresh () {
+    apiGetList({ site }, dispatch)
+  }
+  return <StyledNav>
+    <LoginArea>
+      <div>
+        {account}
+      </div>
+      <button onClick={handleSignOut}>
                 登出
-            </button>
-        </LoginArea>
-        <StyledSearchBar handleAddClick={handleAddClick} />
-        <Menu
-            list={menuList}
-            activeNav={activeNav}
-            handleRefresh={handleRefresh}
-        />
-        {/* <Login modalOpen={modalOpen}
+      </button>
+    </LoginArea>
+    <StyledSearchBar handleAddClick={handleAddClick} />
+    <Menu
+      list={menuList}
+      activeNav={activeNav}
+      handleRefresh={handleRefresh}
+    />
+    {/* <Login modalOpen={modalOpen}
             handleLogin={handleLogin}
         /> */}
-    </Nav>
+  </StyledNav>
 }
 
-const Nav = styled.div`
+const StyledNav = styled.div`
 background:${({ theme }) => theme.navBackground};
 box-sizing:border-box;
 padding:42px 20px 0 20px;

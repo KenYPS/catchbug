@@ -1,10 +1,10 @@
-import React, { useContext, useMemo, useRef, useState } from "react"
+import React, { useContext, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import media from 'cssMix/index'
 import { ContextStore } from 'Reducer'
 import { List } from 'immutable'
 
-// comp 
+// comp
 import Items from './Items'
 import Search from './Search'
 
@@ -16,60 +16,59 @@ import { apiDeleteList, apiAddList, apiGetList } from 'api'
 
 import useOutsideClickListener from 'useHooks/useOutsideClickListener'
 
-export default props => {
-    const { state: { stateReducer }, dispatch } = useContext(ContextStore)
-    const itemList = stateReducer.get('itemList', List)
-    const site = stateReducer.getIn(['menuList', 0, 'name'])
-    const addItemNum = stateReducer.get('searchValue')
+export default function Main () {
+  const { state: { stateReducer }, dispatch } = useContext(ContextStore)
+  const itemList = stateReducer.get('itemList', List)
+  const site = stateReducer.getIn(['menuList', 0, 'name'])
+  const addItemNum = stateReducer.get('searchValue')
 
-    const [reomoveButtonSeq, setReomoveButtonSeq] = useState()
+  const [reomoveButtonSeq, setReomoveButtonSeq] = useState()
 
-    const popRef = useRef()
-    const clickElementRef = useRef()
+  const popRef = useRef()
+  const clickElementRef = useRef()
 
-    const filteredList = useMemo(() => itemList.filter(v => {
-        const itemNum = v.get('itemNum', '')
-        return itemNum.includes(addItemNum)
+  const filteredList = useMemo(() => itemList.filter(v => {
+    const itemNum = v.get('itemNum', '')
+    return itemNum.includes(addItemNum)
+  })
+  , [itemList, addItemNum])
+
+  useOutsideClickListener(popRef, setReomoveButtonSeq.bind(null, ''), clickElementRef)
+
+  const handleRemoveClick = (deleteItemNum) => {
+    apiDeleteList({ deleteItemNum, site }, dispatch)
+  }
+
+  const handleImgClick = (link) => {
+    const windowOpen = window.open()
+    new Promise(resolve => {
+      resolve()
+    }).then(() => {
+      windowOpen.location.href = link
     })
-        , [itemList, addItemNum])
-
-    useOutsideClickListener(popRef, setReomoveButtonSeq.bind(null, ''), clickElementRef)
-
-
-    const handleRemoveClick = (deleteItemNum) => {
-        apiDeleteList({ deleteItemNum, site }, dispatch)
-    }
-
-    const handleImgClick = (link) => {
-        const windowOpen = window.open()
-        new Promise(res => {
-            res()
-        }).then(() => {
-            windowOpen.location.href = link
-        })
-    }
-    function handleAddClick() {
-        apiAddList({ addItemNum, site }, dispatch)
-    }
-    function handleRefresh() {
-        apiGetList({ site }, dispatch)
-    }
-    return <Main>
-        <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh} />
-        <Items
-            popRef={popRef}
-            clickElementRef={clickElementRef}
-            list={filteredList}
-            handleRemoveClick={handleRemoveClick}
-            handleImgClick={handleImgClick}
-            reomoveButtonSeq={reomoveButtonSeq}
-            setReomoveButtonSeq={setReomoveButtonSeq}
-        />
-    </Main>
+  }
+  function handleAddClick () {
+    apiAddList({ addItemNum, site }, dispatch)
+  }
+  function handleRefresh () {
+    apiGetList({ site }, dispatch)
+  }
+  return <StyledMain>
+    <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh} />
+    <Items
+      popRef={popRef}
+      clickElementRef={clickElementRef}
+      list={filteredList}
+      handleRemoveClick={handleRemoveClick}
+      handleImgClick={handleImgClick}
+      reomoveButtonSeq={reomoveButtonSeq}
+      setReomoveButtonSeq={setReomoveButtonSeq}
+    />
+  </StyledMain>
 }
 
 // style
-const Main = styled.div`
+const StyledMain = styled.div`
 background:#12110f;
 width:100%;
 padding:70px 150px;
@@ -84,4 +83,3 @@ ${media.tablet`
         `
     }
 `
-

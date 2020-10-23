@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "yarn startFront && yarn startBack",
+    "start": "node ./back/index.js",
     "startFront": " PORT=8000 react-scripts start",
     "startBack": "nodemon ./back/index.js",
     "build": "react-scripts build GENERATE_SOURCEMAP=false",

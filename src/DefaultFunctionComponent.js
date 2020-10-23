@@ -1,12 +1,13 @@
-import React, { } from "react";
+import React, { } from 'react'
 import styled from 'styled-components'
 
 // style
-const StyledDefaultTemplate = styled.div``;
+const StyledDefaultTemplate = styled.div``
 
-export default props => {
+export default function defaultFunctionComp () {
+  return (
+    <StyledDefaultTemplate>
 
-  return <StyledDefaultTemplate>
-
-  </StyledDefaultTemplate>;
-};
+    </StyledDefaultTemplate>
+  )
+}

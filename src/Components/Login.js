@@ -1,32 +1,34 @@
-import React, { useState } from "react"
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import ModalBox from 'Components/common/Modalbox'
 
-import {  lineLogin, useLineLoggingCheck } from 'api'
+import { lineLogin, useLineLoggingCheck } from 'api'
+import useLocalStorage from 'useHooks/useLocalStorage'
 
-export default () => {
-    const [modalOpen, setModalOpen] = useState(true)
-    useLineLoggingCheck(setModalOpen)
-    // useApiVerifyUser(setModalOpen)
+export default function Login () {
+  const [modalOpen, setModalOpen] = useState(true)
+  const [storedValue] = useLocalStorage('accessToken')
+  useLineLoggingCheck(setModalOpen, storedValue)
+  // useApiVerifyUser(setModalOpen)
 
-    // const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
+  // const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
 
-    // function handleGoogleLogin() {
-    //     apiGoogleLogin()
-    // }
+  // function handleGoogleLogin() {
+  //     apiGoogleLogin()
+  // }
 
-    function handleLineLogin() {
-        lineLogin()
-    }
+  function handleLineLogin () {
+    lineLogin()
+  }
 
-    return <ModalBox
-        isOpen={modalOpen}
-    >
-        <Container>
-            {/* <StyledInput>
+  return <ModalBox
+    isOpen={modalOpen}
+  >
+    <Container>
+      {/* <StyledInput>
                 <span>帳號</span>
-                <input autoFocus 
+                <input autoFocus
                     value={account}
                 onChange={e => setAccount(e.target.value)} />
             </StyledInput>
@@ -37,21 +39,21 @@ export default () => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}/>
             </StyledInput> */}
-            <ControlArea>
-                <Button
-                    color='#00b900'
-                    onClick={handleLineLogin}>
+      <ControlArea>
+        <Button
+          color='#00b900'
+          onClick={handleLineLogin}>
                     Line登入
-                </Button>
-                {/* <Button 
+        </Button>
+        {/* <Button
                     color='#00bcd4'
                     onClick={handleGoogleLogin}>
                     Google登入
                 </Button> */}
-            </ControlArea>
+      </ControlArea>
 
-        </Container>
-    </ModalBox>
+    </Container>
+  </ModalBox>
 }
 
 const Container = styled.div`
