@@ -14,7 +14,7 @@ function sendLinebot(params) {
         to: userId,
         messages
     }
-    // linebotPushMessage(data)
+    linebotPushMessage(data)
 
 }
 
