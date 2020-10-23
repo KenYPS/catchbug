@@ -1,25 +1,25 @@
-import React, { } from "react"
+import React, { } from 'react'
 import styled from 'styled-components'
 import media from 'cssMix'
 import { List } from 'immutable'
-import { IoMdRefresh} from 'react-icons/io'
+import { IoMdRefresh } from 'react-icons/io'
 
-export default ({ 
-    list = List(),
-    activeNav,
-    handleRefresh
+export default ({
+  list = List(),
+  activeNav,
+  handleRefresh
 }) => {
-    return <Menu>
-        {list.map(v => {
-            const name = v.get('name')
-            return <div className={`list ${activeNav === name && 'active'}`}
-                key={name}
-            >
-                {name}
-            </div>
-        })}
-        <IoMdRefresh onClick={handleRefresh}/>
-    </Menu>
+  return <Menu>
+    {list.map(v => {
+      const name = v.get('name')
+      return <div className={`list ${activeNav === name && 'active'}`}
+        key={name}
+      >
+        {name}
+      </div>
+    })}
+    <IoMdRefresh onClick={handleRefresh}/>
+  </Menu>
 }
 
 // style

@@ -1,54 +1,53 @@
-import React, { memo, useState } from "react"
+import React, { memo, useState } from 'react'
 import styled, { } from 'styled-components'
 import media from 'cssMix/index'
 import { BsThreeDots } from 'react-icons/bs'
-export default memo(({ list,
-    handleImgClick,
-    handleRemoveClick
+export default memo(({
+  list,
+  handleImgClick,
+  handleRemoveClick
 }) => {
-    const [menu, setMenu] = useState()
-    return <GamesContainer>
-        {
-            list.map((v, i) => {
-                const itemNum = v.get('itemNum')
-                const itemImg = v.get('itemImg')
-                const itemName = v.get('itemName')
-                const itemPrice = v.get('itemPrice')
-                const itemStockStatus = v.get('itemStockStatus')
-                const itemLink = v.get('itemLink')
-                return <ItemCard key={i}
-                    backgroundImg={itemImg}
-                >
-                    <div className='gameCardNum'>
-                        {itemNum}
-                        <BsThreeDots onClick={() => setMenu(pre=> !!pre ? '' : itemNum)} />
-                        {menu === itemNum && <div className={`gameCardMenu`} onClick={handleRemoveClick.bind(null,itemNum)}>
+  const [menu, setMenu] = useState()
+  return <GamesContainer>
+    {
+      list.map((v, i) => {
+        const itemNum = v.get('itemNum')
+        const itemImg = v.get('itemImg')
+        const itemName = v.get('itemName')
+        const itemPrice = v.get('itemPrice')
+        const itemStockStatus = v.get('itemStockStatus')
+        const itemLink = v.get('itemLink')
+        return <ItemCard key={i}
+          backgroundImg={itemImg}
+        >
+          <div className='gameCardNum'>
+            {itemNum}
+            <BsThreeDots onClick={() => setMenu(pre => pre ? '' : itemNum)} />
+            {menu === itemNum && <div className={'gameCardMenu'} onClick={handleRemoveClick.bind(null, itemNum)}>
                             移除項目
-                        </div>}
-                    </div>
-                    <div className='gameCardimg' onClick={() => handleImgClick(itemLink)} >
-                        {
-                            itemStockStatus ? <div className='maintain'>
-                                <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' />
-                                <div>缺貨</div>
-                            </div> : <div className='hoverBg'>
-                                    <div>進入網站</div>
-                                </div>
-                        }
-                    </div>
-                    <div className='gameCardTitle'>
-                        {itemPrice}
-                    </div>
-                    <div className='gameCardContent'>
-                        {itemName}
-                    </div>
-                </ItemCard>
-            })
-        }
-    </GamesContainer>
-
+            </div>}
+          </div>
+          <div className='gameCardimg' onClick={() => handleImgClick(itemLink)} >
+            {
+              itemStockStatus ? <div className='maintain'>
+                <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' />
+                <div>缺貨</div>
+              </div> : <div className='hoverBg'>
+                <div>進入網站</div>
+              </div>
+            }
+          </div>
+          <div className='gameCardTitle'>
+            {itemPrice}
+          </div>
+          <div className='gameCardContent'>
+            {itemName}
+          </div>
+        </ItemCard>
+      })
+    }
+  </GamesContainer>
 })
-
 
 const GamesContainer = styled.div`
 width:100%;
@@ -57,7 +56,6 @@ flex-wrap:wrap;
 box-sizing:border-box;
 /* justify-content:space-between; */
 `
-
 
 const ItemCard = styled.div`
 width:173px;
@@ -208,5 +206,3 @@ ${media.mobile`
     }
 
 `
-
-

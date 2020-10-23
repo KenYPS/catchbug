@@ -1,42 +1,39 @@
-import  React, { useState, useEffect } from 'react'
-import styled from "styled-components"
+import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
 import media from 'cssMix/index'
 import { useDebouncedCallback } from 'use-debounce'
-import {FiChevronUp} from 'react-icons/fi'
+import { FiChevronUp } from 'react-icons/fi'
 
 const showIcon = (setShow) => {
-  
   const doc = document.documentElement
-  const top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
+  const top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0)
 
   if (top > 50) setShow(true)
   else if (top === 0) setShow(false)
 }
 
 export default () => {
-    const [isShow, setIsShow] = useState(false)
-    const [debounceSetState] = useDebouncedCallback(() => showIcon(setIsShow), 100)
-    useEffect(() => {
-        const refListner = window.addEventListener('scroll', debounceSetState)
-      return window.removeEventListener('scroll', refListner)
-    }, [debounceSetState])
+  const [isShow, setIsShow] = useState(false)
+  const [debounceSetState] = useDebouncedCallback(() => showIcon(setIsShow), 100)
+  useEffect(() => {
+    const refListner = window.addEventListener('scroll', debounceSetState)
+    return window.removeEventListener('scroll', refListner)
+  }, [debounceSetState])
 
-    const goToTop = () => {
-        window.scroll({
-            top: 0,
-            left: 0,
-            behavior: "smooth"
-        })
-    }
-    return isShow&&<StyledGoTop
-        key='gotop'
-        onClick={goToTop}
-    >
-      <FiChevronUp/>
-    </StyledGoTop>
-
+  const goToTop = () => {
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    })
+  }
+  return isShow && <StyledGoTop
+    key='gotop'
+    onClick={goToTop}
+  >
+    <FiChevronUp/>
+  </StyledGoTop>
 }
-
 
 const StyledGoTop = styled.div`
   position: fixed;

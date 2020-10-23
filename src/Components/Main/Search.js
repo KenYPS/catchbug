@@ -1,21 +1,20 @@
-import React from "react"
+import React from 'react'
 import styled from 'styled-components'
 import media from 'cssMix/index'
-// comp 
+// comp
 import SearchBar from 'Components/common/SearchBar'
 // icon
 import { IoMdRefresh } from 'react-icons/io'
 
-
 export default ({ className, handleRefresh, handleAddClick }) => {
-    return <>
-        <SearchBarArea>
-            <div className='bar'>
-                <SearchBar className={className} handleAddClick={handleAddClick}/>
-            </div>
-            <IoMdRefresh onClick={handleRefresh}/>
-        </SearchBarArea>
-    </>
+  return <>
+    <SearchBarArea>
+      <div className='bar'>
+        <SearchBar className={className} handleAddClick={handleAddClick}/>
+      </div>
+      <IoMdRefresh onClick={handleRefresh}/>
+    </SearchBarArea>
+  </>
 }
 
 const SearchBarArea = styled.div`

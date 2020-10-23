@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from "react"
-import styled from "styled-components"
+import React, { useEffect, useCallback } from 'react'
+import styled from 'styled-components'
 // import { CSSTransition } from 'react-transition-group';
 import noop from 'lodash'
 // import { Motion, spring, TransitionMotion } from 'react-motion';
@@ -56,9 +56,9 @@ export default ({
   }
 
   return (
-    <StyledReactModal isOpen={isOpen}  onClick={onModalClose}>
+    <StyledReactModal isOpen={isOpen} onClick={onModalClose}>
 
-      <Wrapper isOpen={isOpen}  onClick={stopPropa}>
+      <Wrapper isOpen={isOpen} onClick={stopPropa}>
         {children}
       </Wrapper>
 
@@ -68,7 +68,7 @@ export default ({
 
 const Wrapper = ({ children, isOpen = false, className, confirmModal }) => {
   const { x } = useSpring({ from: { x: 0 }, x: isOpen ? 1 : 0, config: { duration: 300 } })
-  return <ModalWarpper  style={{
+  return <ModalWarpper style={{
     transform: x.interpolate(x => `scale(${x})`)
   }}
   >{children}</ModalWarpper>
