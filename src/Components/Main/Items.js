@@ -2,11 +2,12 @@ import React, { memo, useState } from 'react'
 import styled, { } from 'styled-components'
 import media from 'cssMix/index'
 import { BsThreeDots } from 'react-icons/bs'
-export default memo(({
+
+function Items ({
   list,
   handleImgClick,
   handleRemoveClick
-}) => {
+}) {
   const [menu, setMenu] = useState()
   return <GamesContainer>
     {
@@ -47,7 +48,9 @@ export default memo(({
       })
     }
   </GamesContainer>
-})
+}
+
+export default memo(Items)
 
 const GamesContainer = styled.div`
 width:100%;

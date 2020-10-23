@@ -4,12 +4,12 @@ import media from 'cssMix'
 import { List } from 'immutable'
 import { IoMdRefresh } from 'react-icons/io'
 
-export default ({
+export default function Menu ({
   list = List(),
   activeNav,
   handleRefresh
-}) => {
-  return <Menu>
+}) {
+  return <StyledMenu>
     {list.map(v => {
       const name = v.get('name')
       return <div className={`list ${activeNav === name && 'active'}`}
@@ -19,11 +19,11 @@ export default ({
       </div>
     })}
     <IoMdRefresh onClick={handleRefresh}/>
-  </Menu>
+  </StyledMenu>
 }
 
 // style
-const Menu = styled.div`
+const StyledMenu = styled.div`
 position: relative;
 background:${({ theme }) => theme.navBackground};
 width:100%;

@@ -6,7 +6,7 @@ import SearchBar from 'Components/common/SearchBar'
 // icon
 import { IoMdRefresh } from 'react-icons/io'
 
-export default ({ className, handleRefresh, handleAddClick }) => {
+export default function Search ({ className, handleRefresh, handleAddClick }) {
   return <>
     <SearchBarArea>
       <div className='bar'>

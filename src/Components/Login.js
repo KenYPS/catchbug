@@ -6,7 +6,7 @@ import ModalBox from 'Components/common/Modalbox'
 import { lineLogin, useLineLoggingCheck } from 'api'
 import useLocalStorage from 'useHooks/useLocalStorage'
 
-export default () => {
+export default function Login () {
   const [modalOpen, setModalOpen] = useState(true)
   const [storedValue] = useLocalStorage('accessToken')
   useLineLoggingCheck(setModalOpen, storedValue)

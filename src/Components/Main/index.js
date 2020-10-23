@@ -8,11 +8,12 @@ import Items from './Items'
 import Search from './Search'
 // api
 import { apiDeleteList, apiAddList, apiGetList } from 'api'
+import { functions } from 'firebase'
 
 // util
 // import { transToLowercaseAndTrim } from 'Utils/index'
 
-export default props => {
+export default function Main() {
   const { state: { stateReducer }, dispatch } = useContext(ContextStore)
   const itemList = stateReducer.get('itemList', List)
   const site = stateReducer.getIn(['menuList', 0, 'name'])
@@ -40,18 +41,18 @@ export default props => {
   function handleRefresh () {
     apiGetList({ site }, dispatch)
   }
-  return <Main>
+  return <SstyledMain>
     <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh}/>
     <Items
       list={filteredList}
       handleRemoveClick={handleRemoveClick}
       handleImgClick={handleImgClick}
     />
-  </Main>
+  </SstyledMain>
 }
 
 // style
-const Main = styled.div`
+const SstyledMain = styled.div`
 background:#12110f;
 width:100%;
 padding:70px 150px;

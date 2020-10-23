@@ -12,7 +12,7 @@ const showIcon = (setShow) => {
   else if (top === 0) setShow(false)
 }
 
-export default () => {
+export default function GoTop () {
   const [isShow, setIsShow] = useState(false)
   const [debounceSetState] = useDebouncedCallback(() => showIcon(setIsShow), 100)
   useEffect(() => {
@@ -53,15 +53,15 @@ const StyledGoTop = styled.div`
   justify-content:center;
   >svg{
     height:40px;
-    width:40px;
+      width:40px;
       color:${({ theme }) => theme.colors['13']};
 
   }
 ${
     media.tablet`
       width:50px;
-    height:50px;
-  bottom:30px;
+      height:50px;
+      bottom:30px;
 >svg{
     height:30px;
     width:30px; 

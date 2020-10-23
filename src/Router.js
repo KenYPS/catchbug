@@ -10,6 +10,6 @@ const Config = () => {
 
   </Switch>
 }
-export default () => {
+export default function RouterConfig () {
   return <Config />
 }

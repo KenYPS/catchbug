@@ -37,12 +37,12 @@ const StyledReactModal = styled.div`
 }
 
 `
-export default ({
+export default function Modalbox ({
   isOpen = false,
   onModalClose = noop,
   children,
   confirmModal = false
-}) => {
+}) {
   const escClick = useCallback(event => {
     if (event.keyCode === 27) onModalClose()
   }, [onModalClose])

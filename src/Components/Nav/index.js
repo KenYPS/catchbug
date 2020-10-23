@@ -10,7 +10,7 @@ import SearchBar from 'Components/common/SearchBar'
 // api
 import { apiAddList, apiGetList } from 'api'
 
-export default props => {
+export default function Nav () {
   const { state: { stateReducer }, dispatch } = useContext(ContextStore)
   const activeNav = stateReducer.get('activeNav')
   const account = stateReducer.get('account')
@@ -32,7 +32,7 @@ export default props => {
   function handleRefresh () {
     apiGetList({ site }, dispatch)
   }
-  return <Nav>
+  return <StyledNav>
     <LoginArea>
       <div>
         {account}
@@ -50,10 +50,10 @@ export default props => {
     {/* <Login modalOpen={modalOpen}
             handleLogin={handleLogin}
         /> */}
-  </Nav>
+  </StyledNav>
 }
 
-const Nav = styled.div`
+const StyledNav = styled.div`
 background:${({ theme }) => theme.navBackground};
 box-sizing:border-box;
 padding:42px 20px 0 20px;

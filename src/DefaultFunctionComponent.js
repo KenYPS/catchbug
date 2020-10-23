@@ -4,7 +4,7 @@ import styled from 'styled-components'
 // style
 const StyledDefaultTemplate = styled.div``
 
-export default props => {
+export default function defaultFunctionComp () {
   return (
     <StyledDefaultTemplate>
 
