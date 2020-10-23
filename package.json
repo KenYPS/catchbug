@@ -38,7 +38,6 @@
     "use-debounce": "^3.4.3"
   },
   "devDependencies": {
-    "eslint": "^7.11.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.21.1",
     "eslint-plugin-node": "^11.1.0",
