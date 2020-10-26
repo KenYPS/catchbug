@@ -24,8 +24,8 @@ export default function Main () {
 
   const [reomoveButtonSeq, setReomoveButtonSeq] = useState()
 
-  const popRef = useRef()
-  const clickElementRef = useRef()
+  const popRef = useRef(null)
+  const clickElementRef = useRef(null)
 
   const filteredList = useMemo(() => itemList.filter(v => {
     const itemNum = v.get('itemNum', '')
@@ -33,7 +33,7 @@ export default function Main () {
   })
   , [itemList, addItemNum])
 
-  useOutsideClickListener(popRef, setReomoveButtonSeq.bind(null, ''), clickElementRef)
+  useOutsideClickListener(clickElementRef, setReomoveButtonSeq.bind(null, ''), popRef)
 
   const handleRemoveClick = (deleteItemNum) => {
     apiDeleteList({ deleteItemNum, site }, dispatch)
@@ -79,7 +79,7 @@ ${media.tablet`
     `
     }
     ${media.mobile`
-        padding:32px 10px;
+          padding:32px 10px;
         `
     }
 `

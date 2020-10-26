@@ -6,13 +6,9 @@ export default (ref, onOutsideClick = noop, iconRef) => {
   console.log(iconRef)
   useEffect(() => {
     function handleClickOutside (event) {
-      // if (iconRef.current.contains(event.target)) return
-      // if (ref.current && !ref.current.contains(event.target)) {
-      //   onOutsideClick()
-      // }
-      console.log(ref)
-      console.log(iconRef)
-      console.log(process.env.REACT_ENVIROMENT)
+      if (ref.current && !ref.current.contains(event.target)) {
+        onOutsideClick()
+      }
     }
     // Bind the event listener
     document.addEventListener('mousedown', handleClickOutside)

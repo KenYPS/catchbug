@@ -24,17 +24,19 @@ function Items ({
         return <ItemCard key={i}
           backgroundImg={itemImg}
         >
-          <div className='gameCardNum'>
+          <div className='gameCardNum' onClick={() => setReomoveButtonSeq(pre => pre === itemNum ? '' : itemNum)} >
             {itemNum}
-            <BsThreeDots ref={clickElementRef} onClick={() => setReomoveButtonSeq(pre => pre ? '' : itemNum)} />
-            {reomoveButtonSeq === itemNum && <div ref={popRef} className={'gameCardMenu'} onClick={handleRemoveClick.bind(null, itemNum)}>
+            <div className='gameCardMoreInfo' ref={clickElementRef}>
+              <BsThreeDots/>
+            </div>
+            {reomoveButtonSeq === itemNum && <div className={'gameCardMenu'} onClick={handleRemoveClick.bind(null, itemNum)}>
                             移除項目
             </div>}
           </div>
           <div className='gameCardimg' onClick={() => handleImgClick(itemLink)} >
             {
               itemStockStatus ? <div className='maintain'>
-                <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' />
+                {/* <img alt='' src='https://images.cq9web.com/game-lobby/common/maintain.png' /> */}
                 <div>缺貨</div>
               </div> : <div className='hoverBg'>
                 <div>進入網站</div>
@@ -73,7 +75,7 @@ position: relative;
     display: flex;
     justify-content:space-between;
     position: relative;
-    >svg{
+    .gameCardMoreInfo{
         cursor: pointer;
     }
     .gameCardMenu{

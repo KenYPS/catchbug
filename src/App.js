@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { HashRouter as Router } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import themeStyle from 'Css/style'
@@ -12,6 +12,15 @@ function App () {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { stateReducer } = state
   const theme = stateReducer.get('theme')
+
+  useEffect(() => {
+    // Object.defineProperty(document, 'domain', {
+    //   set: undefined
+    // })
+    delete document.domain
+    window.addEventListener('storage', function () { console.log(44444) })
+  }, [])
+
   return <ContextStore.Provider value={{ state, dispatch }}>
     <ThemeProvider theme={themeStyle[theme]} test={theme}>
       <>

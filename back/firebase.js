@@ -1,13 +1,12 @@
-const admin = require("firebase-admin")
+const admin = require('firebase-admin')
 
-var serviceAccount = require("./credential.js")
-
+var serviceAccount = require('./credential.js')
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://catchbug-f8326.firebaseio.com"
-});
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://catchbug-f8326.firebaseio.com'
+})
 
 module.exports = {
-    admin
+  admin
 }

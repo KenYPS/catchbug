@@ -1,101 +1,85 @@
-const { linebotPushMessage } = require("../linebot/api")
-const globalStore = require("../store")
+const { linebotPushMessage } = require('../linebot/api')
+const globalStore = require('../store')
 
-
-function sendLinebot(params) {
-    const { userId, info, } = params
-    const text =combindText(info)
-    const messages = [{
-        type: 'text',
-        text}
-    ]
-
-    const data = {
-        to: userId,
-        messages
-    }
-    linebotPushMessage(data)
-
+function sendLinebot (params) {
+  const { userId, info } = params
+  const text = combindText(info)
+  const messages = [{
+    type: 'text',
+    text
+  }
+  ]
+  const data = {
+    to: userId,
+    messages
+  }
+  linebotPushMessage(data)
 }
 
 const combindText = (info) => {
-    let text =''
-    for (let index = 0; index < info.length; index++) {
-        const { itemStockStatus, itemName, itemLink } = info[index]
-        text += !!itemStockStatus ? `恭喜老爺賀喜夫人，${itemName} 有貨了，手刀下訂去${itemLink}\n` : `QQ${itemName}沒貨了\n`
-
-
-    } 
-    return text
+  let text = ''
+  for (let index = 0; index < info.length; index++) {
+    const { itemStockStatus, itemName, itemLink } = info[index]
+    text += itemStockStatus ? `恭喜老爺賀喜夫人，${itemName} 有貨了，手刀下訂去${itemLink}\n` : `QQ${itemName}沒貨了\n`
+  }
+  return text
 }
 
-async function sendMessageToUser(lineBotPushList) {
-    await Promise.all(
-        lineBotPushList.map(sendLinebot)
-    )
+async function sendMessageToUser (lineBotPushList) {
+  await Promise.all(
+    lineBotPushList.map(sendLinebot)
+  )
 }
 
-function checkUserHasItemInList(stockStatusChangeList) {
-    let lineBotPushList = []
+function checkUserHasItemInList (stockStatusChangeList) {
+  const lineBotPushList = []
 
-    const { userListData } = globalStore
-    // see which user has this item
-    for (const userId in userListData) {
-        const userItemList = userListData[userId]
-        const info = getUserPushStockInfoArray(userItemList, stockStatusChangeList)
-        if (info.length > 0) {
-            lineBotPushList.push({ userId, info })
+  const { userListData } = globalStore
+  // see which user has this item
+  for (const userId in userListData) {
+    const userItemList = userListData[userId]
+    const info = getUserPushStockInfoArray(userItemList, stockStatusChangeList)
+    if (info.length > 0) {
+      lineBotPushList.push({ userId, info })
+    }
+  }
+  if (lineBotPushList.length > 0) {
+    sendMessageToUser(lineBotPushList)
+  }
+}
+
+function getUserPushStockInfoArray (userItemList, stockStatusChangeList) {
+  const data = []
+  for (let index = 0; index < userItemList.length; index++) {
+    const item = userItemList[index]
+    for (let j = 0; j < stockStatusChangeList.length; j++) {
+      const stockStatusItem = stockStatusChangeList[j]
+      const { itemNum } = stockStatusItem
+      if (item === itemNum) { data.push(stockStatusItem) }
+    }
+  }
+
+  return data
+}
+
+function getStockStatusChangeList (preItemList = [], newLists = []) {
+  const newStatusDiffList = []
+  if (preItemList && newLists) {
+    for (let index = 0; index < newLists.length; index++) {
+      const { itemNum, itemStockStatus, itemName, itemLink } = newLists[index]
+      for (let j = 0; j < preItemList.length; j++) {
+        const { itemNum: compareItemNum, itemStockStatus: compareItemStockStatus } = preItemList[j]
+        if (itemNum === compareItemNum && itemStockStatus !== compareItemStockStatus) {
+          newStatusDiffList.push({ itemNum, itemStockStatus: !!itemStockStatus, itemName, itemLink })
         }
+      }
     }
-    if (lineBotPushList.length > 0) {
-        sendMessageToUser(lineBotPushList)
-    }
+  }
+  const stockStatusChangeList = [...new Set(newStatusDiffList.filter(v => v.itemNum))]
+
+  if (stockStatusChangeList.length > 0) {
+    checkUserHasItemInList(stockStatusChangeList)
+  }
 }
 
-function getUserPushStockInfoArray(userItemList, stockStatusChangeList) {
-    let data = []
-    for (let index = 0; index < userItemList.length; index++) {
-        const item = userItemList[index]
-        for (let j = 0; j < stockStatusChangeList.length; j++) {
-            const stockStatusItem = stockStatusChangeList[j]
-            const { itemNum } = stockStatusItem
-            if (item === itemNum)
-                data.push(stockStatusItem)
-        }
-    }
-
-    return data
-}
-
-
-
-
-
-
-function getStockStatusChangeList(preItemList = [], newLists = []) {
-    let newStatusDiffList = []
-    if (preItemList && newLists)
-        for (let index = 0; index < newLists.length; index++) {
-            const { itemNum, itemStockStatus, itemName, itemLink } = newLists[index]
-            for (let j = 0; j < preItemList.length; j++) {
-                const { itemNum: compareItemNum, itemStockStatus: compareItemStockStatus } = preItemList[j]
-                if (itemNum === compareItemNum && itemStockStatus !== compareItemStockStatus) {
-                    newStatusDiffList.push({ itemNum, itemStockStatus: !!itemStockStatus, itemName, itemLink })
-                }
-            }
-        }
-    const stockStatusChangeList = [...new Set(newStatusDiffList.filter(v => v.itemNum))]
-
-    if (stockStatusChangeList.length > 0) {
-        checkUserHasItemInList(stockStatusChangeList)
-    }
-
-}
-
-
-
-
-
-
-
-module.exports = getStockStatusChangeList 
+module.exports = getStockStatusChangeList

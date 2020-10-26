@@ -17,7 +17,6 @@ service.interceptors.request.use(
   config => {
     config.headers.token = localStorage.getItem('accessToken')
     config.headers.idtoken = localStorage.getItem('idToken')
-    console.log(localStorage.getItem('accessToken'))
     return config
   },
   error => Promise.reject(error)
@@ -50,9 +49,13 @@ export const useLineLoggingCheck = (setModalOpen) => {
   const code = query.code
 
   useEffect(() => {
-    if (accessToken) {
+    if (accessToken && idToken) {
       apiLineAuth(setModalOpen, dispatch, site, idToken)
-    } else if (code && !accessToken) {
+    }
+  }, [accessToken, dispatch, idToken, setModalOpen, site])
+
+  useEffect(() => {
+    if (code && !accessToken) {
       apiLineLogin(setModalOpen, dispatch, site, code, setAccessToken, setIdToken)
     }
   }, [accessToken, code, dispatch, idToken, setAccessToken, setIdToken, setModalOpen, site])
@@ -116,6 +119,7 @@ const apiLineLogin = (setModalOpen, dispatch, site, code, setAccessToken, setIdT
       const { id_token: idToken, access_token: accessToken } = res.data
       setAccessToken(accessToken)
       setIdToken(idToken)
+
       loggedinAction({ setModalOpen, dispatch, site, idToken })
     }, err => {
       console.log(err.response.data)

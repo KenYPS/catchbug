@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-function useLocalStorage (key, initialValue) {
+function useLocalStorage (key, initialValue = '') {
   // State to store our value
   // Pass initial state function to useState so logic is only executed once
 
@@ -10,7 +10,7 @@ function useLocalStorage (key, initialValue) {
       const item = localStorage.getItem(key)
       console.log(item)
       // Parse stored json or if none return initialValue
-      return item ? JSON.parse(item) : initialValue
+      return item || initialValue
     } catch (error) {
       // If error also return initialValue
       console.log(error)
@@ -19,9 +19,7 @@ function useLocalStorage (key, initialValue) {
   })
 
   useEffect(() => {
-    const valueToStore =
-      storedValue instanceof Function ? storedValue(storedValue) : storedValue
-    if (valueToStore) { localStorage.setItem(key, valueToStore) } else { localStorage.removeItem(key) }
+    if (storedValue) { localStorage.setItem(key, storedValue) } else { localStorage.removeItem(key) }
   }, [key, storedValue])
 
   return [storedValue, setStoredValue]
