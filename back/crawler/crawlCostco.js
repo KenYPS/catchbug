@@ -19,6 +19,13 @@ const startCrawler = (list = []) => {
   setInterval(iteralList, 6 * 60 * 1000)
 }
 
+function checkIfItemNumCanBeCrawled(params) {
+  const url = `https://www.costco.com.tw/search?text=${itemNum}`
+  return 
+}
+
+
+
 function crawl (itemNum) {
   const url = `https://www.costco.com.tw/search?text=${itemNum}`
   return new Promise((resolve, reject) => {

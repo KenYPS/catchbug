@@ -2,8 +2,6 @@ import { useEffect } from 'react'
 import noop from 'lodash'
 
 export default (ref, onOutsideClick = noop, iconRef) => {
-  console.log(ref)
-  console.log(iconRef)
   useEffect(() => {
     function handleClickOutside (event) {
       if (ref.current && !ref.current.contains(event.target)) {

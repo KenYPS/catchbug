@@ -4,4 +4,8 @@ COPY . /home/www
 
 WORKDIR /home/www
 
-ENTRYPOINT [ "node start" ]
+RUN yarn
+RUN yarn build
+
+EXPOSE 5000
+CMD [ "node", "./back/index.js" ]

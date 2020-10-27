@@ -24,7 +24,6 @@ export default function Main () {
 
   const [reomoveButtonSeq, setReomoveButtonSeq] = useState()
 
-  const popRef = useRef(null)
   const clickElementRef = useRef(null)
 
   const filteredList = useMemo(() => itemList.filter(v => {
@@ -33,14 +32,14 @@ export default function Main () {
   })
   , [itemList, addItemNum])
 
-  useOutsideClickListener(clickElementRef, setReomoveButtonSeq.bind(null, ''), popRef)
+  useOutsideClickListener(clickElementRef, setReomoveButtonSeq.bind(null, ''))
 
   const handleRemoveClick = (deleteItemNum) => {
     apiDeleteList({ deleteItemNum, site }, dispatch)
   }
 
   const handleImgClick = (link) => {
-    const windowOpen = window.open()
+    const windowOpen = window.open('about:blank')
     new Promise(resolve => {
       resolve()
     }).then(() => {
@@ -56,7 +55,6 @@ export default function Main () {
   return <StyledMain>
     <Search handleAddClick={handleAddClick} handleRefresh={handleRefresh} />
     <Items
-      popRef={popRef}
       clickElementRef={clickElementRef}
       list={filteredList}
       handleRemoveClick={handleRemoveClick}

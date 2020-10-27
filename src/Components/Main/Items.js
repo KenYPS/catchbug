@@ -7,7 +7,6 @@ function Items ({
   list,
   handleImgClick,
   handleRemoveClick,
-  popRef,
   clickElementRef,
   reomoveButtonSeq,
   setReomoveButtonSeq
@@ -24,9 +23,9 @@ function Items ({
         return <ItemCard key={i}
           backgroundImg={itemImg}
         >
-          <div className='gameCardNum' onClick={() => setReomoveButtonSeq(pre => pre === itemNum ? '' : itemNum)} >
+          <div className='gameCardNum' >
             {itemNum}
-            <div className='gameCardMoreInfo' ref={clickElementRef}>
+            <div className='gameCardMoreInfo' ref={clickElementRef} onClick={() => setReomoveButtonSeq(pre => pre === itemNum ? '' : itemNum)} >
               <BsThreeDots/>
             </div>
             {reomoveButtonSeq === itemNum && <div className={'gameCardMenu'} onClick={handleRemoveClick.bind(null, itemNum)}>

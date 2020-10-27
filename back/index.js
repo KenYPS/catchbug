@@ -73,7 +73,6 @@ var server = app.listen(process.env.PORT || 5000, function () {
 
 
 
-
 // line
 function getlineUserAuth (access_token, res) {
   console.log(access_token)

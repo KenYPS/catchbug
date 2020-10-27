@@ -13,5 +13,3 @@ services:
     # expose:
     #   - '8081'
     command: 'yarn;npm start'
-
-    asia.gcr.io/silken-agent-289708/
