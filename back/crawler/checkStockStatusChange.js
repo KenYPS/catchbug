@@ -13,6 +13,7 @@ function sendLinebot (params) {
     to: userId,
     messages
   }
+  console.log(data);
   linebotPushMessage(data)
 }
 
@@ -20,7 +21,7 @@ const combindText = (info) => {
   let text = ''
   for (let index = 0; index < info.length; index++) {
     const { itemStockStatus, itemName, itemLink } = info[index]
-    text += itemStockStatus ? `恭喜老爺賀喜夫人，${itemName} 有貨了，手刀下訂去${itemLink}\n` : `QQ${itemName}沒貨了\n`
+    text += itemStockStatus ? `恭喜老爺賀喜夫人，${itemName} 有貨了，手刀下訂去${itemLink}\n` : `QQ ${itemName}沒貨了\n`
   }
   return text
 }
@@ -64,7 +65,7 @@ function getUserPushStockInfoArray (userItemList, stockStatusChangeList) {
 
 function getStockStatusChangeList (preItemList = [], newLists = []) {
   const newStatusDiffList = []
-  if (preItemList && newLists) {
+  if (preItemList.length>0 && newLists.length>0) {
     for (let index = 0; index < newLists.length; index++) {
       const { itemNum, itemStockStatus, itemName, itemLink } = newLists[index]
       for (let j = 0; j < preItemList.length; j++) {

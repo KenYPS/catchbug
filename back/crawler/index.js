@@ -12,6 +12,7 @@ module.exports = rootRef.on('value', snapshot => {
       crawlerList = [...val[key][user], ...crawlerList]
     }
   }
+  
   globalStore.userListData = val.Costco
   const filteredList = new Set(crawlerList)
   const ListArray = [...filteredList]

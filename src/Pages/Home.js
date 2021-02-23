@@ -1,4 +1,4 @@
-import React, { } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import media from 'cssMix/index'
 
@@ -9,21 +9,21 @@ import GoTop from 'Components/GoTop'
 
 // style
 const Container = styled.div`
-display: flex;
-width:100%;
-min-height:100%;
-${media.tablet`
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  ${media.tablet`
     flex-direction:column;
   `}
 `
 
-const Home = props => {
+const Home = (props) => {
   return (
     <Container>
-      <Nav/>
-      <Main/>
-      <Login/>
-      <GoTop/>
+      <Nav />
+      <Main />
+      <Login />
+      <GoTop />
     </Container>
   )
 }

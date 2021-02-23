@@ -18,7 +18,6 @@ function App () {
     //   set: undefined
     // })
     delete document.domain
-    window.addEventListener('storage', function () { console.log(44444) })
   }, [])
 
   return <ContextStore.Provider value={{ state, dispatch }}>

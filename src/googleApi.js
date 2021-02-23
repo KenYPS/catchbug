@@ -24,6 +24,7 @@ function logginedDispatch (user, setModalOpen, dispatch, site) {
 
 // verify isLogged in
 export const useApiVerifyUser = (setModalOpen) => {
+  
   const { state: { stateReducer }, dispatch } = useContext(ContextStore)
   const site = stateReducer.getIn(['menuList', 0, 'name'])
 

@@ -9,13 +9,7 @@ var bot = linebot({
 bot.on('message', function (event) {
   // get user message from `event.message.text`
   // reply same message
-  console.log(event)
-  var replyMsg = `${event.message.text}`
-  event.reply(replyMsg).then(function (dat) {
-    console.log('ok')
-  }).catch(function (error) {
-    console.error(error)
-  })
+  // var replyMsg = `${event.message.text}`
 })
 
 bot.on('join', event => {

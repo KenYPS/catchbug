@@ -5,7 +5,7 @@ import ModalBox from 'Components/common/Modalbox'
 
 import { lineLogin, useLineLoggingCheck } from 'api'
 
-export default function Login () {
+export default function Login() {
   const [modalOpen, setModalOpen] = useState(true)
   useLineLoggingCheck(setModalOpen)
   // useApiVerifyUser(setModalOpen)
@@ -16,15 +16,14 @@ export default function Login () {
   //     apiGoogleLogin()
   // }
 
-  function handleLineLogin () {
+  function handleLineLogin() {
     lineLogin()
   }
 
-  return <ModalBox
-    isOpen={modalOpen}
-  >
-    <Container>
-      {/* <StyledInput>
+  return (
+    <ModalBox isOpen={modalOpen}>
+      <Container>
+        {/* <StyledInput>
                 <span>帳號</span>
                 <input autoFocus
                     value={account}
@@ -37,27 +36,25 @@ export default function Login () {
                 value={password}
                 onChange={e => setPassword(e.target.value)}/>
             </StyledInput> */}
-      <ControlArea>
-        <Button
-          color='#00b900'
-          onClick={handleLineLogin}>
-                    Line登入
-        </Button>
-        {/* <Button
+        <ControlArea>
+          <Button color="#00b900" onClick={handleLineLogin}>
+            Line登入
+          </Button>
+          {/* <Button
                     color='#00bcd4'
                     onClick={handleGoogleLogin}>
                     Google登入
                 </Button> */}
-      </ControlArea>
-
-    </Container>
-  </ModalBox>
+        </ControlArea>
+      </Container>
+    </ModalBox>
+  )
 }
 
 const Container = styled.div`
-width:100%;
-box-sizing:border-box;
-text-align:center;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
 `
 
 // style
@@ -75,21 +72,21 @@ text-align:center;
 // `
 
 const ControlArea = styled.div`
-width:100%;
-display: flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 `
 
 const Button = styled.button`
-width:90%;
-line-height:30px;
-border-radius:5px;
-background-color: ${({ color }) => color};
-margin:10px 0;
-cursor: pointer;
-:hover{
-    opacity:0.7;
-}
+  width: 90%;
+  line-height: 30px;
+  border-radius: 5px;
+  background-color: ${({ color }) => color};
+  margin: 10px 0;
+  cursor: pointer;
+  :hover {
+    opacity: 0.7;
+  }
 `

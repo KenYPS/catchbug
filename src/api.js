@@ -14,16 +14,16 @@ import useLocalStorage from 'useHooks/useLocalStorage'
 export const service = axios.create()
 
 service.interceptors.request.use(
-  config => {
+  (config) => {
     config.headers.token = localStorage.getItem('accessToken')
     config.headers.idtoken = localStorage.getItem('idToken')
     return config
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error)
 )
 
-service.interceptors.response.use(
-  res => {
+service.interceptors.response.use (
+     (res) => {
     const result = fromJS(get(res, ['data', 'result']))
     const errorCode = get(res, ['data', 'error_code'])
     const errorMessage = get(res, ['data', 'error_msg'])
@@ -31,7 +31,7 @@ service.interceptors.response.use(
     if (errorCode !== 1) alert(errorMessage)
     return { result, errorCode, errorMessage }
   },
-  error => {
+  (error) => {
     const errorMessage = get(error, ['response', 'data', 'error_msg'])
     console.error({ ...error })
     alert(errorMessage)
@@ -41,7 +41,10 @@ service.interceptors.response.use(
 
 // line
 export const useLineLoggingCheck = (setModalOpen) => {
-  const { state: { stateReducer }, dispatch } = useContext(ContextStore)
+  const {
+    state: { stateReducer },
+    dispatch
+  } = useContext(ContextStore)
   const site = stateReducer.getIn(['menuList', 0, 'name'])
   const [accessToken, setAccessToken] = useLocalStorage('accessToken')
   const [idToken, setIdToken] = useLocalStorage('idToken')
@@ -56,9 +59,25 @@ export const useLineLoggingCheck = (setModalOpen) => {
 
   useEffect(() => {
     if (code && !accessToken) {
-      apiLineLogin(setModalOpen, dispatch, site, code, setAccessToken, setIdToken)
+      apiLineLogin(
+        setModalOpen,
+        dispatch,
+        site,
+        code,
+        setAccessToken,
+        setIdToken
+      )
     }
-  }, [accessToken, code, dispatch, idToken, setAccessToken, setIdToken, setModalOpen, site])
+  }, [
+    accessToken,
+    code,
+    dispatch,
+    idToken,
+    setAccessToken,
+    setIdToken,
+    setModalOpen,
+    site
+  ])
 }
 
 export const lineLogin = () => {
@@ -79,33 +98,36 @@ export const lineLogin = () => {
   window.location.href = lineAuthUrl
 }
 // get list
-export const apiGetList = (params, dispatch) => service
-  .get('/getList', { params })
-  .then(({ result }) => {
+export const apiGetList = (params, dispatch) =>
+  service.get('/getList', { params }).then(({ result }) => {
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
   })
 
 // add list
-export const apiAddList = (data, dispatch) => service
-  .put('/addItem', data)
-  .then(() => {
+export const apiAddList = (data, dispatch) =>
+  service.put('/addItem', data).then(() => {
     dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
   })
 
 // remove list
-export const apiDeleteList = (data, dispatch) => service
-  .put('/deleteItem', data)
-  .then(({ result }) => {
+export const apiDeleteList = (data, dispatch) =>
+  service.put('/deleteItem', data).then(({ result }) => {
     dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
   })
 
-const apiLineAuth = (setModalOpen, dispatch, site, idToken) => service
-  .post('/line/auth')
-  .then(({ result }) => {
+const apiLineAuth = (setModalOpen, dispatch, site, idToken) =>
+  service.post('/line/auth').then(({ result }) => {
     loggedinAction({ setModalOpen, dispatch, site, idToken })
   })
 
-const apiLineLogin = (setModalOpen, dispatch, site, code, setAccessToken, setIdToken) => {
+const apiLineLogin = (
+  setModalOpen,
+  dispatch,
+  site,
+  code,
+  setAccessToken,
+  setIdToken
+) => {
   const requestData = {
     grant_type: 'authorization_code',
     code: code,
@@ -114,16 +136,18 @@ const apiLineLogin = (setModalOpen, dispatch, site, code, setAccessToken, setIdT
     client_secret: process.env.REACT_APP_client_secret
   }
   const data = qs.stringify(requestData)
-  axios.post('https://api.line.me/oauth2/v2.1/token', data)
-    .then(res => {
+  axios.post('https://api.line.me/oauth2/v2.1/token', data).then(
+    (res) => {
       const { id_token: idToken, access_token: accessToken } = res.data
       setAccessToken(accessToken)
       setIdToken(idToken)
 
       loggedinAction({ setModalOpen, dispatch, site, idToken })
-    }, err => {
+    },
+    (err) => {
       console.log(err.response.data)
-    })
+    }
+  )
 }
 
 function loggedinAction ({ dispatch, setModalOpen, site, idToken }) {

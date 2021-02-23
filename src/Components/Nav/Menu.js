@@ -1,52 +1,49 @@
-import React, { } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import media from 'cssMix'
 import { List } from 'immutable'
 import { IoMdRefresh } from 'react-icons/io'
 
-export default function Menu ({
-  list = List(),
-  activeNav,
-  handleRefresh
-}) {
-  return <StyledMenu>
-    {list.map(v => {
-      const name = v.get('name')
-      return <div className={`list ${activeNav === name && 'active'}`}
-        key={name}
-      >
-        {name}
-      </div>
-    })}
-    <IoMdRefresh onClick={handleRefresh}/>
-  </StyledMenu>
+export default function Menu({ list = List(), activeNav, handleRefresh }) {
+  return (
+    <StyledMenu>
+      {list.map((v) => {
+        const name = v.get('name')
+        return (
+          <div className={`list ${activeNav === name && 'active'}`} key={name}>
+            {name}
+          </div>
+        )
+      })}
+      <IoMdRefresh onClick={handleRefresh} />
+    </StyledMenu>
+  )
 }
 
 // style
 const StyledMenu = styled.div`
-position: relative;
-background:${({ theme }) => theme.navBackground};
-width:100%;
-font-size:20px;
-color:${({ theme }) => theme.colors['5']};
-overflow-x:auto;
-cursor: pointer;
-.list{
-    text-align:center;
+  position: relative;
+  background: ${({ theme }) => theme.navBackground};
+  width: 100%;
+  font-size: 20px;
+  color: ${({ theme }) => theme.colors['5']};
+  overflow-x: auto;
+  .list {
+    text-align: center;
     margin-bottom: 28px;
-    &.active{
-      color:${({ theme }) => theme.colors['1']};
+    cursor:pointer;
+    &.active {
+      color: ${({ theme }) => theme.colors['1']};
     }
-}
->svg{
+  }
+  > svg {
     position: absolute;
-    right:0;
-    width:30px;
+    right: 0;
+    width: 30px;
     height: 30px;
-    color:${({ theme }) => theme.colors['1']};
-
-}
-${media.tablet`
+    color: ${({ theme }) => theme.colors['1']};
+  }
+  ${media.tablet`
 display:flex;
 align-items:center;
 padding:0;

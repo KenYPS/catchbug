@@ -2,7 +2,7 @@ import React from 'react'
 
 import { reducer as stateReducer } from './store'
 
-const combineReducer = reducers => {
+const combineReducer = (reducers) => {
   const reducerKeys = Object.keys(reducers)
   const objInitState = {}
 
@@ -31,8 +31,4 @@ const reducer = combineReducer({
 const initialState = reducer()
 const ContextStore = React.createContext(initialState)
 
-export {
-  initialState,
-  ContextStore,
-  reducer
-}
+export { initialState, ContextStore, reducer }
