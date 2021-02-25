@@ -1,44 +1,52 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import media from 'cssMix/index'
-import { ContextStore } from 'Reducer'
 
 // comp
 import Menu from './Menu'
 import SearchBar from 'Components/common/SearchBar'
 
 // api
-import { apiAddList, apiGetList } from 'api'
+// import {  apiLineLogout } from 'api'
 
-export default function Nav () {
-  const {
-    state: { stateReducer },
-    dispatch
-  } = useContext(ContextStore)
+import { useDispatch, useSelector } from 'react-redux'
+import { selectData } from 'Reducer/dataSlice'
+import { selectUser } from 'Reducer/userSlice'
+import { fetchItemList } from 'Reducer/dataSlice'
+import { fetchAddList } from 'Reducer/dataSlice'
+import { fetchLineLogout } from 'Reducer/userSlice'
 
-  const activeNav = stateReducer.get('activeNav')
-  const account = stateReducer.get('account')
-  const menuList = stateReducer.get('menuList')
-  const addItemNum = stateReducer.get('searchValue')
-  const site = stateReducer.getIn(['menuList', 0, 'name'])
+export default function Nav() {
+  const dispatch = useDispatch()
+  const { account } = useSelector(selectUser)
+  const {  menuList, searchValue: addItemNum } = useSelector(
+    selectData
+  )
+    const site = menuList[0].name
+  const [activeNav, setActiveNav] = useState(site)
+
 
   useEffect(() => {
     dispatch({
       type: 'SET_DATA',
       path: 'activeNav',
-      value: menuList.getIn([0, 'name'])
+      value: site,
     })
-  }, [dispatch, menuList])
+  }, [dispatch, menuList,site])
 
-  function handleAddClick () {
-    apiAddList({ addItemNum, site }, dispatch)
+  function handleAddClick() {
+    if (!addItemNum) return
+    dispatch(fetchAddList({ addItemNum, site }))
+    // apiAddList({ addItemNum, site }, dispatch)
   }
 
-  function handleSignOut () {
-    // apiLogOut(dispatch)
+  function handleSignOut() {
+    dispatch(fetchLineLogout())
+    // apiLineLogout(dispatch)
   }
-  function handleRefresh () {
-    apiGetList({ site }, dispatch)
+  function handleRefresh() {
+    dispatch(fetchItemList({ site }))
+    // apiGetList({ site }, dispatch)
   }
   return (
     <StyledNav>
@@ -51,6 +59,7 @@ export default function Nav () {
         list={menuList}
         activeNav={activeNav}
         handleRefresh={handleRefresh}
+        setActiveNav={setActiveNav}
       />
       {/* <Login modalOpen={modalOpen}
             handleLogin={handleLogin}

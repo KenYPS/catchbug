@@ -1,21 +1,16 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
 import ModalBox from 'Components/common/Modalbox'
 
 import { lineLogin, useLineLoggingCheck } from 'api'
+import { selectUser } from 'Reducer/userSlice'
+import { useSelector } from 'react-redux'
 
 export default function Login() {
-  const [modalOpen, setModalOpen] = useState(true)
-  useLineLoggingCheck(setModalOpen)
-  // useApiVerifyUser(setModalOpen)
-
-  // const apiGoogleLogin = useApiGoogleLogin(setModalOpen)
-
-  // function handleGoogleLogin() {
-  //     apiGoogleLogin()
-  // }
-
+  const { idToken } = useSelector(selectUser)
+  useLineLoggingCheck()
+  const modalOpen = useMemo(() => !idToken, [idToken])
   function handleLineLogin() {
     lineLogin()
   }

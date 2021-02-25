@@ -1,16 +1,19 @@
-import { useEffect, useContext } from 'react'
+import { useEffect } from 'react'
 import axios from 'axios'
-import { ContextStore } from 'Reducer'
-import { fromJS } from 'immutable'
 import get from 'lodash/get'
 import '@firebase/auth'
 import '@firebase/database'
 import qs from 'querystring'
 import jwtDecoded from 'jwt-decode'
+import { useDispatch, useSelector } from 'react-redux'
 
 import lineLoginConfig from 'common/lineLoginConfig'
-import useLocalStorage from 'useHooks/useLocalStorage'
 
+import { setUserDetail } from 'Reducer/userSlice'
+import { selectData } from 'Reducer/dataSlice'
+import { fetchItemList } from 'Reducer/dataSlice'
+import { setToken } from 'Reducer/userSlice'
+import { selectUser } from 'Reducer/userSlice'
 export const service = axios.create()
 
 service.interceptors.request.use(
@@ -22,9 +25,9 @@ service.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-service.interceptors.response.use (
-     (res) => {
-    const result = fromJS(get(res, ['data', 'result']))
+service.interceptors.response.use(
+  (res) => {
+    const result = get(res, ['data', 'result'])
     const errorCode = get(res, ['data', 'error_code'])
     const errorMessage = get(res, ['data', 'error_msg'])
 
@@ -40,109 +43,63 @@ service.interceptors.response.use (
 )
 
 // line
-export const useLineLoggingCheck = (setModalOpen) => {
-  const {
-    state: { stateReducer },
-    dispatch
-  } = useContext(ContextStore)
-  const site = stateReducer.getIn(['menuList', 0, 'name'])
-  const [accessToken, setAccessToken] = useLocalStorage('accessToken')
-  const [idToken, setIdToken] = useLocalStorage('idToken')
+export const useLineLoggingCheck = () => {
+  const { accessToken, idToken } = useSelector(selectUser)
+  const dispatch = useDispatch()
+  const { menuList } = useSelector(selectData)
+  const site = menuList[0].name
   const query = qs.parse(window.location.search.substring(1))
   const code = query.code
 
   useEffect(() => {
-    if (accessToken && idToken) {
-      apiLineAuth(setModalOpen, dispatch, site, idToken)
+    if (code && !accessToken) {
+      apiLineLogin(dispatch, code)
     }
-  }, [accessToken, dispatch, idToken, setModalOpen, site])
+  }, [accessToken, code, dispatch, idToken, site])
 
   useEffect(() => {
-    if (code && !accessToken) {
-      apiLineLogin(
-        setModalOpen,
-        dispatch,
-        site,
-        code,
-        setAccessToken,
-        setIdToken
-      )
+    if (accessToken && idToken) {
+      apiLineAuth(dispatch, site, idToken)
     }
-  }, [
-    accessToken,
-    code,
-    dispatch,
-    idToken,
-    setAccessToken,
-    setIdToken,
-    setModalOpen,
-    site
-  ])
+  }, [accessToken, dispatch, idToken, site])
+
 }
 
 export const lineLogin = () => {
-  // const search = qs.stringify({
-  //   response_type: 'code',
-  //   client_id: lineLoginConfig.client_id,
-  //   redirect_uri: lineLoginConfig.redirect_uri,
-  //   state: '123',
-  //   scope: 'profile%20openid%20email'
-  // })
-  // console.log(search)
   let lineAuthUrl = 'https://access.line.me/oauth2/v2.1/authorize?'
   lineAuthUrl += 'response_type=code'
   lineAuthUrl += `&client_id=${lineLoginConfig.client_id}`
   lineAuthUrl += `&redirect_uri=${lineLoginConfig.redirect_uri}`
-  lineAuthUrl += '&state=123'
+  lineAuthUrl += '&state=success'
   lineAuthUrl += '&scope=profile%20openid%20email'
   window.location.href = lineAuthUrl
 }
-// get list
-export const apiGetList = (params, dispatch) =>
-  service.get('/getList', { params }).then(({ result }) => {
-    dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
-  })
 
-// add list
-export const apiAddList = (data, dispatch) =>
-  service.put('/addItem', data).then(() => {
-    dispatch({ type: 'SET_DATA', path: 'searchValue', value: '' })
+export const apiLineLogout = (dispatch) => {
+  service.post('/logout').then((res) => {
+    dispatch()
   })
+}
 
-// remove list
-export const apiDeleteList = (data, dispatch) =>
-  service.put('/deleteItem', data).then(({ result }) => {
-    dispatch({ type: 'SET_DATA', path: 'itemList', value: result })
-  })
-
-const apiLineAuth = (setModalOpen, dispatch, site, idToken) =>
+const apiLineAuth = (dispatch, site, idToken) =>
   service.post('/line/auth').then(({ result }) => {
-    loggedinAction({ setModalOpen, dispatch, site, idToken })
+    loggedinAction({ dispatch, site, idToken })
   })
 
-const apiLineLogin = (
-  setModalOpen,
-  dispatch,
-  site,
-  code,
-  setAccessToken,
-  setIdToken
-) => {
+const apiLineLogin = (dispatch, code) => {
   const requestData = {
     grant_type: 'authorization_code',
     code: code,
     redirect_uri: lineLoginConfig.redirect_uri,
     client_id: lineLoginConfig.client_id,
-    client_secret: process.env.REACT_APP_client_secret
+    client_secret: process.env.REACT_APP_client_secret,
   }
   const data = qs.stringify(requestData)
   axios.post('https://api.line.me/oauth2/v2.1/token', data).then(
     (res) => {
       const { id_token: idToken, access_token: accessToken } = res.data
-      setAccessToken(accessToken)
-      setIdToken(idToken)
-
-      loggedinAction({ setModalOpen, dispatch, site, idToken })
+      dispatch(setToken({ accessToken, idToken }))
+      // loggedinAction({ dispatch, site, idToken })
     },
     (err) => {
       console.log(err.response.data)
@@ -150,11 +107,10 @@ const apiLineLogin = (
   )
 }
 
-function loggedinAction ({ dispatch, setModalOpen, site, idToken }) {
+function loggedinAction({ dispatch, site, idToken }) {
   const decoded = jwtDecoded(idToken)
   const { email } = decoded
-
-  dispatch({ type: 'SET_DATA', path: 'account', value: email })
-  apiGetList({ site }, dispatch)
-  setModalOpen(false)
+  dispatch(setUserDetail(email))
+  dispatch(fetchItemList({ site }))
+  // apiGetList({ site }, dispatch)
 }

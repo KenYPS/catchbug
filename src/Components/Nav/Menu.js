@@ -4,18 +4,22 @@ import media from 'cssMix'
 import { List } from 'immutable'
 import { IoMdRefresh } from 'react-icons/io'
 
-export default function Menu({ list = List(), activeNav, handleRefresh }) {
+export default function Menu({ list = List(), activeNav, handleRefresh, setActiveNav }) {
   return (
     <StyledMenu>
       {list.map((v) => {
-        const name = v.get('name')
+        const name = v.name
         return (
-          <div className={`list ${activeNav === name && 'active'}`} key={name}>
+          <div
+            className={`list ${activeNav === name && 'active'}`}
+            key={name}
+            onClick={() => setActiveNav(name)}
+          >
             {name}
           </div>
         )
       })}
-      <IoMdRefresh onClick={handleRefresh} />
+      <IoMdRefresh class="refresh" onClick={handleRefresh} />
     </StyledMenu>
   )
 }
@@ -42,6 +46,9 @@ const StyledMenu = styled.div`
     width: 30px;
     height: 30px;
     color: ${({ theme }) => theme.colors['1']};
+  }
+  .refresh{
+    cursor:pointer;
   }
   ${media.tablet`
 display:flex;

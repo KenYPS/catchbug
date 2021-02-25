@@ -1,47 +1,53 @@
-import React, { useContext, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import media from 'cssMix/index'
-import { ContextStore } from 'Reducer'
-import { List } from 'immutable'
 
 // comp
 import Items from './Items'
 import Search from './Search'
 
 // api
-import { apiDeleteList, apiAddList, apiGetList } from 'api'
+// import { apiDeleteList, apiAddList, apiGetList } from 'api'
 
 // util
 // import { transToLowercaseAndTrim } from 'Utils/index'
 
 import useOutsideClickListener from 'useHooks/useOutsideClickListener'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectData } from 'Reducer/dataSlice'
+import { fetchItemList } from 'Reducer/dataSlice'
+import { fetchAddList } from 'Reducer/dataSlice'
+import { fetchDeleteList } from 'Reducer/dataSlice'
 
 export default function Main() {
-  const {
-    state: { stateReducer },
-    dispatch
-  } = useContext(ContextStore)
-  const itemList = stateReducer.get('itemList', List)
-  const site = stateReducer.getIn(['menuList', 0, 'name'])
-  const addItemNum = stateReducer.get('searchValue')
+  const dispatch = useDispatch()
+  const { itemList, menuList, searchValue: addItemNum } = useSelector(
+    selectData
+  )
+  const site = menuList[0].name
 
   const [reomoveButtonSeq, setReomoveButtonSeq] = useState()
 
   const clickElementRef = useRef(null)
-
+  const iconRef = useRef(null)
   const filteredList = useMemo(
     () =>
       itemList.filter((v) => {
-        const itemNum = v.get('itemNum', '')
+        const itemNum = v.itemNum
         return itemNum.includes(addItemNum)
       }),
     [itemList, addItemNum]
   )
 
-  useOutsideClickListener(clickElementRef, setReomoveButtonSeq.bind(null, ''))
+  useOutsideClickListener(
+    iconRef,
+    setReomoveButtonSeq.bind(null, ''),
+    clickElementRef
+  )
 
   const handleRemoveClick = (deleteItemNum) => {
-    apiDeleteList({ deleteItemNum, site }, dispatch)
+    dispatch(fetchDeleteList({ deleteItemNum, site }))
+    // apiDeleteList({ deleteItemNum, site }, dispatch)
   }
 
   const handleImgClick = (link) => {
@@ -53,10 +59,13 @@ export default function Main() {
     })
   }
   function handleAddClick() {
-    apiAddList({ addItemNum, site }, dispatch)
+    if (!addItemNum) return
+    dispatch(fetchAddList({ addItemNum, site }))
+    // apiAddList({ addItemNum, site }, dispatch)
   }
   function handleRefresh() {
-    apiGetList({ site }, dispatch)
+    dispatch(fetchItemList({ site }))
+    // apiGetList({ site }, dispatch)
   }
   return (
     <StyledMain>
@@ -68,6 +77,7 @@ export default function Main() {
         handleImgClick={handleImgClick}
         reomoveButtonSeq={reomoveButtonSeq}
         setReomoveButtonSeq={setReomoveButtonSeq}
+        iconRef={iconRef}
       />
     </StyledMain>
   )

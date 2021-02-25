@@ -13,7 +13,6 @@ function sendLinebot (params) {
     to: userId,
     messages
   }
-  console.log(data);
   linebotPushMessage(data)
 }
 

@@ -1,30 +1,7 @@
-import { fromJS } from 'immutable'
-
-const SET_DATA = 'SET_DATA'
-
-const initialState = fromJS({
-  theme: 'main',
-  activeNav: '',
-  searchValue: '',
-  account: '',
-  naem: '',
-  menuList: [{
-    name: 'Costco'
-  }],
-  // fetch data
-  itemList: []
+import { configureStore } from '@reduxjs/toolkit'
+import rootReducer from './rootReducer'
+const store = configureStore({
+  reducer: rootReducer,
 })
 
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case SET_DATA:
-      return state.set(action.path, action.value)
-    default:
-      return state
-  }
-}
-
-export {
-  initialState,
-  reducer
-}
+export default store

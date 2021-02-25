@@ -9,7 +9,7 @@ module.exports = rootRef.on('value', snapshot => {
   let crawlerList = []
   for (const key in val) {
     for (const user in val[key]) {
-      crawlerList = [...val[key][user], ...crawlerList]
+      crawlerList = [...val[key][user], ...crawlerList].filter(v=>v)
     }
   }
   

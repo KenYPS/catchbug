@@ -1,9 +1,11 @@
 
-import React, { useContext } from 'react'
+import React, { } from 'react'
 import styled from 'styled-components'
-import { ContextStore } from 'Reducer'
 
 import { BiPlus } from 'react-icons/bi'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectData } from 'Reducer/dataSlice'
+import { setSearchValue } from 'Reducer/dataSlice'
 
 const Container = styled.div`
 width:100%;
@@ -23,10 +25,10 @@ position: relative;
 `
 
 const SearchBar = ({ className, handleAddClick }) => {
-  const { state: { stateReducer }, dispatch } = useContext(ContextStore)
-  const searchValue = stateReducer.get('searchValue')
+  const { searchValue } = useSelector(selectData)
+  const dispatch = useDispatch()
   const inputHandler = (value) => {
-    dispatch({ type: 'SET_DATA', path: 'searchValue', value })
+    dispatch(setSearchValue(value))
   }
   return <Container
     className={className}>

@@ -1,6 +1,6 @@
 require('dotenv').config()
 require('./crawler/index')
-
+const qs = require('querystring')
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
@@ -36,7 +36,6 @@ app.use(bodyParser.raw())
 
 app.post('/line/auth', (req, res) => {
   const access_token = req.headers.token
-  console.log(access_token)
   getlineUserAuth(access_token, res)
 })
 
@@ -60,11 +59,14 @@ app.put('/deleteItem', (req, res) => {
   const userId = users[access_token].userId
   firebaseDeleteList({ site, userId, res }, deleteItemNum)
 })
-
-// if (process.env.NODE_ENV === 'production')
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../public/index.html'))
+app.post('/logout', (req, res) => {
+  const access_token = req.headers.token
+  postLineLogOut(access_token, res)
 })
+// if (process.env.NODE_ENV === 'production')
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname + '../public/index.html'))
+// })
 
 var server = app.listen(process.env.PORT || 5000, function () {
   var port = server.address().port
@@ -72,22 +74,24 @@ var server = app.listen(process.env.PORT || 5000, function () {
 })
 
 // line
-function getlineUserAuth(access_token, res) {
+async function getlineUserAuth(access_token, res) {
   console.log(access_token)
-  axios
+  const expires_in = await axios
     .get(`https://api.line.me/oauth2/v2.1/verify?access_token=${access_token}`)
     .then((response) => {
       const { expires_in } = response.data
-      getUserProfile(access_token, expires_in).then(() => {
-        const sendCode = resCode(1)
-        res.send(sendCode)
-      })
+      return expires_in
     })
     .catch((err) => {
-      // console.log(err);
+      console.log(err)
       const errCode = resCode(2)
       res.send(errCode)
     })
+
+  getUserProfile(access_token, expires_in).then(() => {
+    const sendCode = resCode(1)
+    res.send(sendCode)
+  })
 }
 
 function getUserProfile(access_token, expires_in) {
@@ -103,11 +107,29 @@ function getUserProfile(access_token, expires_in) {
       users[access_token].setTimeout = setTimeout(() => {
         delete users[access_token]
       }, expires_in)
-
       users[access_token].userId = userId
     })
 }
 
+function postLineLogOut(access_token, res) {
+  return axios
+    .post(
+      'https://api.line.me/oauth2/v2.1/revoke',
+      qs.stringify({
+        access_token,
+        client_id: 1654992288,
+        client_secret: '1ee3506cbf6479755ec5f898e1953fba',
+      })
+    )
+    .then((response) => {
+      console.log(response)
+      const errCode = resCode(1)
+      res.send(errCode)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
 //  firebase
 function firebaseGetUserItemList({ site, userId, res }, data) {
   const { itemLists } = globalStore
@@ -117,8 +139,8 @@ function firebaseGetUserItemList({ site, userId, res }, data) {
     (userItemLists = [], rej) => {
       if (itemLists.length > 0) {
         data = itemLists.filter((v) => {
-          console.log(v);
-         return  userItemLists.includes(v.itemNum) 
+          console.log(v)
+          return userItemLists.includes(v.itemNum)
         })
         sendCode = resCode(1, data)
       } else {

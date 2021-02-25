@@ -10,16 +10,17 @@ function Items({
   clickElementRef,
   reomoveButtonSeq,
   setReomoveButtonSeq,
+  iconRef,
 }) {
   return (
     <GamesContainer>
       {list.map((v, i) => {
-        const itemNum = v.get('itemNum')
-        const itemImg = v.get('itemImg')
-        const itemName = v.get('itemName')
-        const itemPrice = v.get('itemPrice')
-        const itemStockStatus = v.get('itemStockStatus')
-        const itemLink = v.get('itemLink')
+        const itemNum = v.itemNum
+        const itemImg = v.itemImg
+        const itemName = v.itemName
+        const itemPrice = v.itemPrice
+        const itemStockStatus = v.itemStockStatus
+        const itemLink = v.itemLink
         return (
           <ItemCard key={i} backgroundImg={itemImg}>
             <div className="gameCardNum">
@@ -32,15 +33,16 @@ function Items({
                 }
               >
                 <BsThreeDots />
+                {reomoveButtonSeq === itemNum && (
+                  <div
+                    className={'gameCardMenu'}
+                    onClick={handleRemoveClick.bind(null, itemNum)}
+                    ref={iconRef}
+                  >
+                    移除項目
+                  </div>
+                )}
               </div>
-              {reomoveButtonSeq === itemNum && (
-                <div
-                  className={'gameCardMenu'}
-                  onClick={handleRemoveClick.bind(null, itemNum)}
-                >
-                  移除項目
-                </div>
-              )}
             </div>
             <div
               className="gameCardimg"
